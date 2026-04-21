@@ -45,7 +45,7 @@ type LookupList = Array<CatalogResponse | CodedCatalogResponse>;
       }
 
       <section class="content-grid asset-layout">
-        @if (viewMode() !== 'create') {
+        @if (viewMode() === 'list') {
           <article class="card-soft span-2">
             <div class="section-heading compact">
               <p class="eyebrow">Filtros de consulta</p>
@@ -87,117 +87,121 @@ type LookupList = Array<CatalogResponse | CodedCatalogResponse>;
           </article>
         }
 
-        <article class="card-soft span-2 asset-form-card">
-          <div class="section-heading compact">
-            <p class="eyebrow">Cadastro do bem</p>
-            <h2>{{ selectedId() ? 'Atualizar bem' : 'Novo bem' }}</h2>
-          </div>
-
-          <form class="form-grid" [formGroup]="assetForm" (ngSubmit)="submitAsset()">
-            <label class="field span-2"><span>Descrição</span><input class="input" type="text" formControlName="description" /></label>
-            <label class="field"><span>Quantidade</span><input class="input" type="number" min="1" step="1" formControlName="quantity" /></label>
-            <label class="field"><span>Data de aquisição</span>
-              <div class="date-field-wrapper">
-                <input class="input" type="text" inputmode="numeric" placeholder="dd/mm/aaaa" formControlName="acquisitionDate" (input)="onDateInput('asset', 'acquisitionDate', $event)" (blur)="onDateBlur('asset', 'acquisitionDate')" (click)="assetAcqPicker.showPicker()" />
-                <input type="date" class="date-hidden" #assetAcqPicker (change)="onPickerChange('asset', 'acquisitionDate', $event)" />
-                <button type="button" class="date-pick-btn" (click)="assetAcqPicker.showPicker()" aria-label="Abrir calendário">&#x1F4C5;</button>
-              </div>
-            </label>
-            <label class="field"><span>Data de baixa</span>
-              <div class="date-field-wrapper">
-                <input class="input" type="text" inputmode="numeric" placeholder="dd/mm/aaaa" formControlName="disposalDate" (input)="onDateInput('asset', 'disposalDate', $event)" (blur)="onDateBlur('asset', 'disposalDate')" (click)="assetDispPicker.showPicker()" />
-                <input type="date" class="date-hidden" #assetDispPicker (change)="onPickerChange('asset', 'disposalDate', $event)" />
-                <button type="button" class="date-pick-btn" (click)="assetDispPicker.showPicker()" aria-label="Abrir calendário">&#x1F4C5;</button>
-              </div>
-            </label>
-            <label class="field"><span>Valor de aquisição</span><input class="input" type="number" step="0.01" formControlName="acquisitionValue" /></label>
-            <label class="field"><span>Marca</span><input class="input" type="text" formControlName="brand" /></label>
-            <label class="field"><span>Modelo</span><input class="input" type="text" formControlName="model" /></label>
-            <label class="field"><span>Número de série</span><input class="input" type="text" formControlName="serialNumber" /></label>
-            <label class="field"><span>Fabricante</span><input class="input" type="text" formControlName="manufacturer" /></label>
-            <label class="field"><span>Nota fiscal</span><input class="input" type="text" formControlName="invoice" /></label>
-            <label class="field"><span>Cor</span><select class="input" formControlName="colorId"><option [ngValue]="0">Selecione</option>@for (item of colors(); track item.id) {<option [ngValue]="item.id">{{ item.description }}</option>}</select></label>
-            <label class="field"><span>Tipo de bem</span><select class="input" formControlName="assetTypeId"><option [ngValue]="0">Selecione</option>@for (item of assetTypes(); track item.id) {<option [ngValue]="item.id">{{ item.description }} @if (hasCode(item)) {({{ item.code }})}</option>}</select></label>
-            <label class="field"><span>Status</span><select class="input" formControlName="assetStatusId"><option [ngValue]="0">Selecione</option>@for (item of assetStatuses(); track item.id) {<option [ngValue]="item.id">{{ item.description }}</option>}</select></label>
-            <label class="field"><span>Material</span><select class="input" formControlName="assetMaterialId"><option [ngValue]="0">Selecione</option>@for (item of assetMaterials(); track item.id) {<option [ngValue]="item.id">{{ item.description }}</option>}</select></label>
-            <label class="field span-2"><span>Localização</span><select class="input" formControlName="assetLocationId"><option [ngValue]="0">Selecione</option>@for (item of assetLocations(); track item.id) {<option [ngValue]="item.id">{{ item.description }} @if (hasCode(item)) {({{ item.code }})}</option>}</select></label>
-            <label class="field span-2"><span>Foto do bem</span><input class="input" type="file" accept="image/*" (change)="handlePhotoSelection($event)" /></label>
-
-            @if (photoPreview()) {
-              <div class="media-preview span-2"><img [src]="photoPreview()" alt="Prévia do bem" /></div>
-            }
-
-            <div class="button-row span-2">
-              <button type="submit" class="btn btn-primary" [disabled]="loading() || (selectedId() && !canUpdate())">{{ loading() ? 'Salvando...' : selectedId() ? 'Atualizar bem' : 'Cadastrar bem' }}</button>
-              <button type="button" class="btn btn-secondary" (click)="resetAssetForm()">Limpar</button>
+        @if (viewMode() === 'create') {
+          <article class="card-soft span-2 asset-form-card">
+            <div class="section-heading compact">
+              <p class="eyebrow">Cadastro do bem</p>
+              <h2>{{ selectedId() ? 'Atualizar bem' : 'Novo bem' }}</h2>
             </div>
-          </form>
-        </article>
 
-        <article class="card-soft span-2">
-          <div class="section-heading compact">
-            <p class="eyebrow">Listagem retornada</p>
-            <h2>Bens encontrados</h2>
-          </div>
+            <form class="form-grid" [formGroup]="assetForm" (ngSubmit)="submitAsset()">
+              <label class="field span-2"><span>Descrição</span><input class="input" type="text" formControlName="description" /></label>
+              <label class="field"><span>Quantidade</span><input class="input" type="number" min="1" step="1" formControlName="quantity" /></label>
+              <label class="field"><span>Data de aquisição</span>
+                <div class="date-field-wrapper">
+                  <input class="input" type="text" inputmode="numeric" placeholder="dd/mm/aaaa" formControlName="acquisitionDate" (input)="onDateInput('asset', 'acquisitionDate', $event)" (blur)="onDateBlur('asset', 'acquisitionDate')" (click)="assetAcqPicker.showPicker()" />
+                  <input type="date" class="date-hidden" #assetAcqPicker (change)="onPickerChange('asset', 'acquisitionDate', $event)" />
+                  <button type="button" class="date-pick-btn" (click)="assetAcqPicker.showPicker()" aria-label="Abrir calendário">&#x1F4C5;</button>
+                </div>
+              </label>
+              <label class="field"><span>Data de baixa</span>
+                <div class="date-field-wrapper">
+                  <input class="input" type="text" inputmode="numeric" placeholder="dd/mm/aaaa" formControlName="disposalDate" (input)="onDateInput('asset', 'disposalDate', $event)" (blur)="onDateBlur('asset', 'disposalDate')" (click)="assetDispPicker.showPicker()" />
+                  <input type="date" class="date-hidden" #assetDispPicker (change)="onPickerChange('asset', 'disposalDate', $event)" />
+                  <button type="button" class="date-pick-btn" (click)="assetDispPicker.showPicker()" aria-label="Abrir calendário">&#x1F4C5;</button>
+                </div>
+              </label>
+              <label class="field"><span>Valor de aquisição</span><input class="input" type="number" step="0.01" formControlName="acquisitionValue" /></label>
+              <label class="field"><span>Marca</span><input class="input" type="text" formControlName="brand" /></label>
+              <label class="field"><span>Modelo</span><input class="input" type="text" formControlName="model" /></label>
+              <label class="field"><span>Número de série</span><input class="input" type="text" formControlName="serialNumber" /></label>
+              <label class="field"><span>Fabricante</span><input class="input" type="text" formControlName="manufacturer" /></label>
+              <label class="field"><span>Nota fiscal</span><input class="input" type="text" formControlName="invoice" /></label>
+              <label class="field"><span>Cor</span><select class="input" formControlName="colorId"><option [ngValue]="0">Selecione</option>@for (item of colors(); track item.id) {<option [ngValue]="item.id">{{ item.description }}</option>}</select></label>
+              <label class="field"><span>Tipo de bem</span><select class="input" formControlName="assetTypeId"><option [ngValue]="0">Selecione</option>@for (item of assetTypes(); track item.id) {<option [ngValue]="item.id">{{ item.description }} @if (hasCode(item)) {({{ item.code }})}</option>}</select></label>
+              <label class="field"><span>Status</span><select class="input" formControlName="assetStatusId"><option [ngValue]="0">Selecione</option>@for (item of assetStatuses(); track item.id) {<option [ngValue]="item.id">{{ item.description }}</option>}</select></label>
+              <label class="field"><span>Material</span><select class="input" formControlName="assetMaterialId"><option [ngValue]="0">Selecione</option>@for (item of assetMaterials(); track item.id) {<option [ngValue]="item.id">{{ item.description }}</option>}</select></label>
+              <label class="field span-2"><span>Localização</span><select class="input" formControlName="assetLocationId"><option [ngValue]="0">Selecione</option>@for (item of assetLocations(); track item.id) {<option [ngValue]="item.id">{{ item.description }} @if (hasCode(item)) {({{ item.code }})}</option>}</select></label>
+              <label class="field span-2"><span>Foto do bem</span><input class="input" type="file" accept="image/*" (change)="handlePhotoSelection($event)" /></label>
 
-          <div class="table-shell">
-            <table>
-              <thead>
-                <tr>
-                  <th>Bem</th>
-                  <th>Qtd.</th>
-                  <th>Código</th>
-                  <th>Classificação</th>
-                  <th>Valor</th>
-                  <th>Ações</th>
-                </tr>
-              </thead>
-              <tbody>
-                @for (asset of assets(); track asset.id) {
+              @if (photoPreview()) {
+                <div class="media-preview span-2"><img [src]="photoPreview()" alt="Prévia do bem" /></div>
+              }
+
+              <div class="button-row span-2">
+                <button type="submit" class="btn btn-primary" [disabled]="loading() || (selectedId() && !canUpdate())">{{ loading() ? 'Salvando...' : selectedId() ? 'Atualizar bem' : 'Cadastrar bem' }}</button>
+                <button type="button" class="btn btn-secondary" (click)="resetAssetForm()">Limpar</button>
+              </div>
+            </form>
+          </article>
+        }
+
+        @if (viewMode() !== 'reports') {
+          <article class="card-soft span-2">
+            <div class="section-heading compact">
+              <p class="eyebrow">Listagem retornada</p>
+              <h2>Bens encontrados</h2>
+            </div>
+
+            <div class="table-shell">
+              <table>
+                <thead>
                   <tr>
-                    <td data-label="Bem">
-                      <strong>{{ asset.description }}</strong>
-                      <small>{{ asset.brand }} {{ asset.model }}</small>
-                    </td>
-                    <td data-label="Qtd.">{{ asset.quantity }}</td>
-                    <td data-label="Código">{{ asset.assetCode }}</td>
-                    <td data-label="Classificação">
-                      <div class="stacked-inline">
-                        <span>{{ asset.assetType || '-' }}</span>
-                        <small>{{ asset.assetLocation || '-' }} • {{ asset.assetStatus || '-' }}</small>
-                      </div>
-                    </td>
-                    <td data-label="Valor">{{ asset.acquisitionValue || 0 | currency: 'BRL' : 'symbol' : '1.2-2' : 'pt-BR' }}</td>
-                    <td data-label="Ações">
-                      <div class="table-actions">
-                        <button type="button" class="btn btn-ghost btn-sm" [disabled]="!canUpdate()" (click)="editAsset(asset)">Editar</button>
-                        <button type="button" class="btn btn-danger btn-sm" [disabled]="!canDelete()" (click)="deleteAsset(asset.id)">Excluir</button>
-                      </div>
-                    </td>
+                    <th>Bem</th>
+                    <th>Qtd.</th>
+                    <th>Código</th>
+                    <th>Classificação</th>
+                    <th>Valor</th>
+                    <th>Ações</th>
                   </tr>
-                } @empty {
-                  <tr><td colspan="6" class="empty-state">Nenhum bem retornado com os filtros informados.</td></tr>
-                }
-              </tbody>
-            </table>
-          </div>
-
-          <div class="pagination-bar">
-            <p>Página {{ currentPage() + 1 }} de {{ totalPagesLabel() }} · {{ totalElements() }} bens</p>
-            <label class="pagination-size">
-              Itens por página
-              <select class="input pagination-size-select" [value]="pageSize()" (change)="changePageSize($any($event.target).value)">
-                @for (size of pageSizeOptions; track size) {
-                  <option [value]="size">{{ size }}</option>
-                }
-              </select>
-            </label>
-            <div class="pagination-actions">
-              <button type="button" class="btn btn-secondary btn-sm" [disabled]="!hasPreviousPage()" (click)="goToPreviousPage()">Anterior</button>
-              <button type="button" class="btn btn-secondary btn-sm" [disabled]="!hasNextPage()" (click)="goToNextPage()">Próxima</button>
+                </thead>
+                <tbody>
+                  @for (asset of assets(); track asset.id) {
+                    <tr>
+                      <td data-label="Bem">
+                        <strong>{{ asset.description }}</strong>
+                        <small>{{ asset.brand }} {{ asset.model }}</small>
+                      </td>
+                      <td data-label="Qtd.">{{ asset.quantity }}</td>
+                      <td data-label="Código">{{ asset.assetCode }}</td>
+                      <td data-label="Classificação">
+                        <div class="stacked-inline">
+                          <span>{{ asset.assetType || '-' }}</span>
+                          <small>{{ asset.assetLocation || '-' }} • {{ asset.assetStatus || '-' }}</small>
+                        </div>
+                      </td>
+                      <td data-label="Valor">{{ asset.acquisitionValue || 0 | currency: 'BRL' : 'symbol' : '1.2-2' : 'pt-BR' }}</td>
+                      <td data-label="Ações">
+                        <div class="table-actions">
+                          <button type="button" class="btn btn-ghost btn-sm" [disabled]="!canUpdate()" (click)="editAsset(asset)">Editar</button>
+                          <button type="button" class="btn btn-danger btn-sm" [disabled]="!canDelete()" (click)="deleteAsset(asset.id)">Excluir</button>
+                        </div>
+                      </td>
+                    </tr>
+                  } @empty {
+                    <tr><td colspan="6" class="empty-state">Nenhum bem retornado com os filtros informados.</td></tr>
+                  }
+                </tbody>
+              </table>
             </div>
-          </div>
-        </article>
+
+            <div class="pagination-bar">
+              <p>Página {{ currentPage() + 1 }} de {{ totalPagesLabel() }} · {{ totalElements() }} bens</p>
+              <label class="pagination-size">
+                Itens por página
+                <select class="input pagination-size-select" [value]="pageSize()" (change)="changePageSize($any($event.target).value)">
+                  @for (size of pageSizeOptions; track size) {
+                    <option [value]="size">{{ size }}</option>
+                  }
+                </select>
+              </label>
+              <div class="pagination-actions">
+                <button type="button" class="btn btn-secondary btn-sm" [disabled]="!hasPreviousPage()" (click)="goToPreviousPage()">Anterior</button>
+                <button type="button" class="btn btn-secondary btn-sm" [disabled]="!hasNextPage()" (click)="goToNextPage()">Próxima</button>
+              </div>
+            </div>
+          </article>
+        }
 
         <article class="card-soft span-2">
           <div class="section-heading compact">

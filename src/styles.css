@@ -440,6 +440,57 @@ small,
 	grid-template-columns: repeat(2, minmax(0, 1fr));
 }
 
+.asset-form-card {
+	width: 100%;
+}
+
+.asset-form-card .section-heading {
+	justify-items: center;
+	text-align: center;
+}
+
+.date-field-wrapper {
+	position: relative;
+	display: flex;
+	align-items: center;
+}
+
+.date-field-wrapper .input {
+	flex: 1;
+	padding-right: 40px;
+}
+
+.date-hidden {
+	position: absolute;
+	right: 0;
+	top: 0;
+	width: 0;
+	height: 0;
+	opacity: 0;
+	pointer-events: none;
+	border: 0;
+	padding: 0;
+}
+
+.date-pick-btn {
+	position: absolute;
+	right: 8px;
+	top: 50%;
+	transform: translateY(-50%);
+	background: none;
+	border: none;
+	cursor: pointer;
+	padding: 4px;
+	font-size: 1.1rem;
+	line-height: 1;
+	color: var(--text-muted);
+	transition: color 0.15s;
+}
+
+.date-pick-btn:hover {
+	color: var(--primary);
+}
+
 .asset-layout .span-2,
 .span-2 {
 	grid-column: span 2;

@@ -45,35 +45,49 @@ type LookupList = Array<CatalogResponse | CodedCatalogResponse>;
       }
 
       <section class="content-grid asset-layout">
-        <article class="card-soft span-2">
-          <div class="section-heading compact">
-            <p class="eyebrow">Filtros de consulta</p>
-            <h2>Listar e localizar bens</h2>
-          </div>
-
-          <form class="form-grid" [formGroup]="filterForm" (ngSubmit)="searchAssets(true)">
-            <label class="field"><span>Descrição</span><input class="input" type="text" formControlName="description" /></label>
-            <label class="field"><span>Marca</span><input class="input" type="text" formControlName="brand" /></label>
-            <label class="field"><span>Modelo</span><input class="input" type="text" formControlName="model" /></label>
-            <label class="field"><span>Número de série</span><input class="input" type="text" formControlName="serialNumber" /></label>
-            <label class="field"><span>Fabricante</span><input class="input" type="text" formControlName="manufacturer" /></label>
-            <label class="field"><span>Nota fiscal</span><input class="input" type="text" formControlName="invoice" /></label>
-            <label class="field"><span>Aquisição</span><input class="input" type="date" formControlName="acquisitionDate" /></label>
-            <label class="field"><span>Baixa</span><input class="input" type="date" formControlName="disposalDate" /></label>
-            <label class="field"><span>Cor</span><select class="input" formControlName="color"><option value="">Todas</option>@for (item of colors(); track item.id) {<option [value]="item.description">{{ item.description }}</option>}</select></label>
-            <label class="field"><span>Tipo</span><select class="input" formControlName="type"><option value="">Todos</option>@for (item of assetTypes(); track item.id) {<option [value]="item.description">{{ item.description }}</option>}</select></label>
-            <label class="field"><span>Status</span><select class="input" formControlName="status"><option value="">Todos</option>@for (item of assetStatuses(); track item.id) {<option [value]="item.description">{{ item.description }}</option>}</select></label>
-            <label class="field"><span>Material</span><select class="input" formControlName="material"><option value="">Todos</option>@for (item of assetMaterials(); track item.id) {<option [value]="item.description">{{ item.description }}</option>}</select></label>
-            <label class="field span-2"><span>Localização</span><select class="input" formControlName="location"><option value="">Todas</option>@for (item of assetLocations(); track item.id) {<option [value]="item.description">{{ item.description }} @if (hasCode(item)) {({{ item.code }})}</option>}</select></label>
-
-            <div class="button-row span-2">
-              <button type="submit" class="btn btn-secondary">Aplicar filtros</button>
-              <button type="button" class="btn btn-ghost" (click)="clearAssetFilters()">Limpar</button>
+        @if (viewMode() !== 'create') {
+          <article class="card-soft span-2">
+            <div class="section-heading compact">
+              <p class="eyebrow">Filtros de consulta</p>
+              <h2>Listar e localizar bens</h2>
             </div>
-          </form>
-        </article>
 
-        <article class="card-soft">
+            <form class="form-grid" [formGroup]="filterForm" (ngSubmit)="searchAssets(true)">
+              <label class="field"><span>Descrição</span><input class="input" type="text" formControlName="description" /></label>
+              <label class="field"><span>Marca</span><input class="input" type="text" formControlName="brand" /></label>
+              <label class="field"><span>Modelo</span><input class="input" type="text" formControlName="model" /></label>
+              <label class="field"><span>Número de série</span><input class="input" type="text" formControlName="serialNumber" /></label>
+              <label class="field"><span>Fabricante</span><input class="input" type="text" formControlName="manufacturer" /></label>
+              <label class="field"><span>Nota fiscal</span><input class="input" type="text" formControlName="invoice" /></label>
+              <label class="field"><span>Aquisição</span>
+                <div class="date-field-wrapper">
+                  <input class="input" type="text" inputmode="numeric" placeholder="dd/mm/aaaa" formControlName="acquisitionDate" (input)="onDateInput('filter', 'acquisitionDate', $event)" (blur)="onDateBlur('filter', 'acquisitionDate')" (click)="filterAcqPicker.showPicker()" />
+                  <input type="date" class="date-hidden" #filterAcqPicker (change)="onPickerChange('filter', 'acquisitionDate', $event)" />
+                  <button type="button" class="date-pick-btn" (click)="filterAcqPicker.showPicker()" aria-label="Abrir calendário">&#x1F4C5;</button>
+                </div>
+              </label>
+              <label class="field"><span>Baixa</span>
+                <div class="date-field-wrapper">
+                  <input class="input" type="text" inputmode="numeric" placeholder="dd/mm/aaaa" formControlName="disposalDate" (input)="onDateInput('filter', 'disposalDate', $event)" (blur)="onDateBlur('filter', 'disposalDate')" (click)="filterDispPicker.showPicker()" />
+                  <input type="date" class="date-hidden" #filterDispPicker (change)="onPickerChange('filter', 'disposalDate', $event)" />
+                  <button type="button" class="date-pick-btn" (click)="filterDispPicker.showPicker()" aria-label="Abrir calendário">&#x1F4C5;</button>
+                </div>
+              </label>
+              <label class="field"><span>Cor</span><select class="input" formControlName="color"><option value="">Todas</option>@for (item of colors(); track item.id) {<option [value]="item.description">{{ item.description }}</option>}</select></label>
+              <label class="field"><span>Tipo</span><select class="input" formControlName="type"><option value="">Todos</option>@for (item of assetTypes(); track item.id) {<option [value]="item.description">{{ item.description }}</option>}</select></label>
+              <label class="field"><span>Status</span><select class="input" formControlName="status"><option value="">Todos</option>@for (item of assetStatuses(); track item.id) {<option [value]="item.description">{{ item.description }}</option>}</select></label>
+              <label class="field"><span>Material</span><select class="input" formControlName="material"><option value="">Todos</option>@for (item of assetMaterials(); track item.id) {<option [value]="item.description">{{ item.description }}</option>}</select></label>
+              <label class="field span-2"><span>Localização</span><select class="input" formControlName="location"><option value="">Todas</option>@for (item of assetLocations(); track item.id) {<option [value]="item.description">{{ item.description }} @if (hasCode(item)) {({{ item.code }})}</option>}</select></label>
+
+              <div class="button-row span-2">
+                <button type="submit" class="btn btn-secondary">Aplicar filtros</button>
+                <button type="button" class="btn btn-ghost" (click)="clearAssetFilters()">Limpar</button>
+              </div>
+            </form>
+          </article>
+        }
+
+        <article class="card-soft span-2 asset-form-card">
           <div class="section-heading compact">
             <p class="eyebrow">Cadastro do bem</p>
             <h2>{{ selectedId() ? 'Atualizar bem' : 'Novo bem' }}</h2>
@@ -82,8 +96,20 @@ type LookupList = Array<CatalogResponse | CodedCatalogResponse>;
           <form class="form-grid" [formGroup]="assetForm" (ngSubmit)="submitAsset()">
             <label class="field span-2"><span>Descrição</span><input class="input" type="text" formControlName="description" /></label>
             <label class="field"><span>Quantidade</span><input class="input" type="number" min="1" step="1" formControlName="quantity" /></label>
-            <label class="field"><span>Data de aquisição</span><input class="input" type="date" formControlName="acquisitionDate" /></label>
-            <label class="field"><span>Data de baixa</span><input class="input" type="date" formControlName="disposalDate" /></label>
+            <label class="field"><span>Data de aquisição</span>
+              <div class="date-field-wrapper">
+                <input class="input" type="text" inputmode="numeric" placeholder="dd/mm/aaaa" formControlName="acquisitionDate" (input)="onDateInput('asset', 'acquisitionDate', $event)" (blur)="onDateBlur('asset', 'acquisitionDate')" (click)="assetAcqPicker.showPicker()" />
+                <input type="date" class="date-hidden" #assetAcqPicker (change)="onPickerChange('asset', 'acquisitionDate', $event)" />
+                <button type="button" class="date-pick-btn" (click)="assetAcqPicker.showPicker()" aria-label="Abrir calendário">&#x1F4C5;</button>
+              </div>
+            </label>
+            <label class="field"><span>Data de baixa</span>
+              <div class="date-field-wrapper">
+                <input class="input" type="text" inputmode="numeric" placeholder="dd/mm/aaaa" formControlName="disposalDate" (input)="onDateInput('asset', 'disposalDate', $event)" (blur)="onDateBlur('asset', 'disposalDate')" (click)="assetDispPicker.showPicker()" />
+                <input type="date" class="date-hidden" #assetDispPicker (change)="onPickerChange('asset', 'disposalDate', $event)" />
+                <button type="button" class="date-pick-btn" (click)="assetDispPicker.showPicker()" aria-label="Abrir calendário">&#x1F4C5;</button>
+              </div>
+            </label>
             <label class="field"><span>Valor de aquisição</span><input class="input" type="number" step="0.01" formControlName="acquisitionValue" /></label>
             <label class="field"><span>Marca</span><input class="input" type="text" formControlName="brand" /></label>
             <label class="field"><span>Modelo</span><input class="input" type="text" formControlName="model" /></label>
@@ -106,29 +132,6 @@ type LookupList = Array<CatalogResponse | CodedCatalogResponse>;
               <button type="button" class="btn btn-secondary" (click)="resetAssetForm()">Limpar</button>
             </div>
           </form>
-        </article>
-
-        <article class="card-soft">
-          <div class="section-heading compact">
-            <p class="eyebrow">Relatórios e retorno</p>
-            <h2>Saída operacional</h2>
-          </div>
-
-          <div class="report-panel">
-            <button type="button" class="btn btn-secondary btn-block" (click)="downloadReport('csv')">Baixar CSV</button>
-            <button type="button" class="btn btn-secondary btn-block" (click)="downloadReport('excel')">Baixar Excel</button>
-          </div>
-
-          @if (savedAsset()) {
-            <div class="summary-card">
-              <p><strong>Código patrimonial:</strong> {{ savedAsset()?.assetCode }}</p>
-              <p><strong>Descrição:</strong> {{ savedAsset()?.description }}</p>
-              <p><strong>Quantidade:</strong> {{ savedAsset()?.quantity }}</p>
-              @if (barcodeImage()) {
-                <div class="barcode-frame"><img [src]="barcodeImage()" alt="Código de barras" /></div>
-              }
-            </div>
-          }
         </article>
 
         <article class="card-soft span-2">
@@ -194,6 +197,29 @@ type LookupList = Array<CatalogResponse | CodedCatalogResponse>;
               <button type="button" class="btn btn-secondary btn-sm" [disabled]="!hasNextPage()" (click)="goToNextPage()">Próxima</button>
             </div>
           </div>
+        </article>
+
+        <article class="card-soft span-2">
+          <div class="section-heading compact">
+            <p class="eyebrow">Relatórios e retorno</p>
+            <h2>Saída operacional</h2>
+          </div>
+
+          <div class="report-panel">
+            <button type="button" class="btn btn-secondary btn-block" (click)="downloadReport('csv')">Baixar CSV</button>
+            <button type="button" class="btn btn-secondary btn-block" (click)="downloadReport('excel')">Baixar Excel</button>
+          </div>
+
+          @if (savedAsset()) {
+            <div class="summary-card">
+              <p><strong>Código patrimonial:</strong> {{ savedAsset()?.assetCode }}</p>
+              <p><strong>Descrição:</strong> {{ savedAsset()?.description }}</p>
+              <p><strong>Quantidade:</strong> {{ savedAsset()?.quantity }}</p>
+              @if (barcodeImage()) {
+                <div class="barcode-frame"><img [src]="barcodeImage()" alt="Código de barras" /></div>
+              }
+            </div>
+          }
         </article>
       </section>
     </section>
@@ -297,7 +323,12 @@ export class AssetsPageComponent {
       this.currentPage.set(0);
     }
 
-    const filters = this.filterForm.getRawValue() as AssetFilters;
+    const rawFilters = this.filterForm.getRawValue() as AssetFilters;
+    const filters = this.normalizeFilterDates(rawFilters);
+    if (!filters) {
+      return;
+    }
+
     this.assetsApi
       .list(filters, { page: this.currentPage(), size: this.pageSize() })
       .subscribe({
@@ -361,8 +392,12 @@ export class AssetsPageComponent {
       return;
     }
 
-    this.loading.set(true);
     const payload = this.buildAssetPayload();
+    if (!payload) {
+      return;
+    }
+
+    this.loading.set(true);
     const request = this.selectedId()
       ? this.assetsApi.update(this.selectedId()!, payload)
       : this.assetsApi.create(payload);
@@ -393,8 +428,8 @@ export class AssetsPageComponent {
     this.assetForm.patchValue({
       description: asset.description,
       quantity: asset.quantity,
-      acquisitionDate: asset.acquisitionDate ?? '',
-      disposalDate: asset.disposalDate ?? '',
+      acquisitionDate: this.toDisplayDate(asset.acquisitionDate),
+      disposalDate: this.toDisplayDate(asset.disposalDate),
       acquisitionValue: asset.acquisitionValue ?? 0,
       brand: asset.brand ?? '',
       model: asset.model ?? '',
@@ -492,13 +527,26 @@ export class AssetsPageComponent {
     });
   }
 
-  private buildAssetPayload(): AssetRequest {
+  private buildAssetPayload(): AssetRequest | null {
     const raw = this.assetForm.getRawValue();
+    const acquisitionDate = this.toApiDate(raw.acquisitionDate);
+    const disposalDate = this.toApiDate(raw.disposalDate);
+
+    if ((raw.acquisitionDate || '').trim() && !acquisitionDate) {
+      this.setError('Data de aquisição inválida. Use o formato dd/mm/aaaa.');
+      return null;
+    }
+
+    if ((raw.disposalDate || '').trim() && !disposalDate) {
+      this.setError('Data de baixa inválida. Use o formato dd/mm/aaaa.');
+      return null;
+    }
+
     return {
       description: raw.description,
       quantity: Number(raw.quantity),
-      acquisitionDate: raw.acquisitionDate || undefined,
-      disposalDate: raw.disposalDate || undefined,
+      acquisitionDate,
+      disposalDate,
       acquisitionValue: raw.acquisitionValue ? Number(raw.acquisitionValue) : undefined,
       brand: raw.brand || undefined,
       model: raw.model || undefined,
@@ -512,6 +560,151 @@ export class AssetsPageComponent {
       assetLocationId: Number(raw.assetLocationId),
       photoBase64: this.photoBase64() || undefined,
     };
+  }
+
+  onPickerChange(formType: 'filter' | 'asset', controlName: 'acquisitionDate' | 'disposalDate', event: Event): void {
+    const isoValue = (event.target as HTMLInputElement).value; // yyyy-mm-dd
+    if (!isoValue) {
+      return;
+    }
+
+    const display = this.toDisplayDate(isoValue);
+    if (formType === 'filter') {
+      this.filterForm.patchValue({ [controlName]: display } as Partial<AssetFilters>, { emitEvent: false });
+    } else {
+      this.assetForm.patchValue({ [controlName]: display } as Partial<{ acquisitionDate: string; disposalDate: string }>, { emitEvent: false });
+    }
+
+    // reset hidden picker value to stay stateless
+    (event.target as HTMLInputElement).value = '';
+  }
+
+  onDateInput(formType: 'filter' | 'asset', controlName: 'createdFrom' | 'acquisitionDate' | 'disposalDate', event: Event): void {
+    const input = event.target as HTMLInputElement;
+    const masked = this.maskDateValue(input.value);
+    input.value = masked;
+
+    if (formType === 'filter') {
+      this.filterForm.patchValue({ [controlName]: masked } as Partial<AssetFilters>, { emitEvent: false });
+      return;
+    }
+
+    if (controlName === 'createdFrom') {
+      return;
+    }
+
+    this.assetForm.patchValue({ [controlName]: masked } as Partial<{ acquisitionDate: string; disposalDate: string }>, { emitEvent: false });
+  }
+
+  onDateBlur(formType: 'filter' | 'asset', controlName: 'createdFrom' | 'acquisitionDate' | 'disposalDate'): void {
+    const control =
+      formType === 'filter'
+        ? this.filterForm.get(controlName)
+        : controlName === 'createdFrom'
+          ? null
+          : this.assetForm.get(controlName);
+
+    const value = String(control?.value ?? '').trim();
+    if (!value) {
+      return;
+    }
+
+    if (!this.toApiDate(value)) {
+      this.setError('Data inválida. Use o formato dd/mm/aaaa.');
+      return;
+    }
+
+    control?.setValue(this.toDisplayDate(value), { emitEvent: false });
+  }
+
+  private normalizeFilterDates(rawFilters: AssetFilters): AssetFilters | null {
+    const createdFrom = this.toApiDate(rawFilters.createdFrom);
+    const acquisitionDate = this.toApiDate(rawFilters.acquisitionDate);
+    const disposalDate = this.toApiDate(rawFilters.disposalDate);
+
+    if ((rawFilters.createdFrom || '').trim() && !createdFrom) {
+      this.setError('Data inicial inválida. Use o formato dd/mm/aaaa.');
+      return null;
+    }
+
+    if ((rawFilters.acquisitionDate || '').trim() && !acquisitionDate) {
+      this.setError('Data de aquisição inválida. Use o formato dd/mm/aaaa.');
+      return null;
+    }
+
+    if ((rawFilters.disposalDate || '').trim() && !disposalDate) {
+      this.setError('Data de baixa inválida. Use o formato dd/mm/aaaa.');
+      return null;
+    }
+
+    return {
+      ...rawFilters,
+      createdFrom,
+      acquisitionDate,
+      disposalDate,
+    };
+  }
+
+  private maskDateValue(value: string): string {
+    const digits = value.replace(/\D/g, '').slice(0, 8);
+    if (digits.length <= 2) {
+      return digits;
+    }
+
+    if (digits.length <= 4) {
+      return `${digits.slice(0, 2)}/${digits.slice(2)}`;
+    }
+
+    return `${digits.slice(0, 2)}/${digits.slice(2, 4)}/${digits.slice(4)}`;
+  }
+
+  private toDisplayDate(value?: string): string {
+    if (!value) {
+      return '';
+    }
+
+    if (/^\d{2}\/\d{2}\/\d{4}$/.test(value)) {
+      return value;
+    }
+
+    const match = value.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+    if (!match) {
+      return value;
+    }
+
+    return `${match[3]}/${match[2]}/${match[1]}`;
+  }
+
+  private toApiDate(value?: string): string | undefined {
+    const trimmed = String(value ?? '').trim();
+    if (!trimmed) {
+      return undefined;
+    }
+
+    const isoMatch = trimmed.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+    if (isoMatch) {
+      return trimmed;
+    }
+
+    const brMatch = trimmed.match(/^(\d{2})\/(\d{2})\/(\d{4})$/);
+    if (!brMatch) {
+      return undefined;
+    }
+
+    const day = Number(brMatch[1]);
+    const month = Number(brMatch[2]);
+    const year = Number(brMatch[3]);
+    const candidate = new Date(year, month - 1, day);
+    const isValid =
+      candidate.getFullYear() === year &&
+      candidate.getMonth() === month - 1 &&
+      candidate.getDate() === day;
+
+    if (!isValid) {
+      return undefined;
+    }
+
+    return `${String(year).padStart(4, '0')}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
   }
 
   private findLookupId(list: LookupList, description?: string): number {

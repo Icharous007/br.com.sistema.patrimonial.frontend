@@ -15,6 +15,7 @@ import {
   CodedCatalogResponse,
 } from '../../core/api.models';
 import { AuthService } from '../../core/auth/auth.service';
+import { BrlCurrencyMaskDirective } from '../../shared/directives/brl-currency-mask.directive';
 import { AssetsApiService } from '../../core/services/assets-api.service';
 import { CatalogApiService } from '../../core/services/catalog-api.service';
 
@@ -23,7 +24,7 @@ type LookupList = Array<CatalogResponse | CodedCatalogResponse>;
 @Component({
   selector: 'app-assets-page',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, CurrencyPipe],
+  imports: [CommonModule, ReactiveFormsModule, CurrencyPipe, BrlCurrencyMaskDirective],
   template: `
     <section class="page-stack">
       <div class="page-header card-soft">
@@ -111,7 +112,7 @@ type LookupList = Array<CatalogResponse | CodedCatalogResponse>;
                   <button type="button" class="date-pick-btn" (click)="assetDispPicker.showPicker()" aria-label="Abrir calendário">&#x1F4C5;</button>
                 </div>
               </label>
-              <label class="field"><span>Valor de aquisição</span><input class="input" type="number" step="0.01" formControlName="acquisitionValue" /></label>
+              <label class="field"><span>Valor de aquisição</span><input class="input" type="text" inputmode="numeric" placeholder="R$ 0,00" formControlName="acquisitionValue" appBrlCurrencyMask /></label>
               <label class="field"><span>Marca</span><input class="input" type="text" formControlName="brand" /></label>
               <label class="field"><span>Modelo</span><input class="input" type="text" formControlName="model" /></label>
               <label class="field"><span>Número de série</span><input class="input" type="text" formControlName="serialNumber" /></label>

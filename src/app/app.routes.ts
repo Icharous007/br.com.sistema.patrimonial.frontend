@@ -8,6 +8,7 @@ import { LoginPageComponent } from './features/auth/login-page.component';
 import { ShellComponent } from './features/layout/shell.component';
 import { AssetsPageComponent } from './features/pages/assets-page.component';
 import { CatalogPageComponent } from './features/pages/catalog-page.component';
+import { MyProfilePageComponent } from './features/pages/my-profile-page.component';
 import { ProfilesPageComponent } from './features/pages/profiles-page.component';
 import { UsersPageComponent } from './features/pages/users-page.component';
 import { WelcomePageComponent } from './features/pages/welcome-page.component';
@@ -26,6 +27,10 @@ export const routes: Routes = [
 			{
 				path: 'welcome',
 				component: WelcomePageComponent,
+			},
+			{
+				path: 'my-profile',
+				component: MyProfilePageComponent,
 			},
 			{
 				path: 'users',

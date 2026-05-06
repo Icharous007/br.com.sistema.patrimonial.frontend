@@ -33,7 +33,7 @@ export class AssetsApiService {
     return this.http.delete<void>(`${API_BASE_URL}/api/assets/${id}`);
   }
 
-  downloadReport(format: 'csv' | 'excel') {
+  downloadReport(format: 'csv' | 'excel' | 'pdf') {
     return this.http.get(`${API_BASE_URL}/api/assets/report/${format}`, {
       responseType: 'blob',
     });

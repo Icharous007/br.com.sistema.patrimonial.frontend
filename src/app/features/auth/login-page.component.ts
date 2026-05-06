@@ -101,8 +101,12 @@ export class LoginPageComponent {
       })
       .pipe(finalize(() => this.loading.set(false)))
       .subscribe({
-        next: () => {
-          void this.router.navigate(['/welcome']);
+        next: (response) => {
+          if (response.requirePasswordChange) {
+            void this.router.navigate(['/my-profile'], { queryParams: { view: 'password' } });
+          } else {
+            void this.router.navigate(['/welcome']);
+          }
         },
         error: (error: HttpErrorResponse) => {
           this.errorMessage.set(this.resolveErrorMessage(error));

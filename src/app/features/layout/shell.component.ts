@@ -16,6 +16,15 @@ const MENU_SECTIONS: MenuSection[] = [
     ],
   },
   {
+    id: 'minha-conta',
+    label: 'Minha Conta',
+    roles: ['COMUM', 'SECRETARIO', 'ADMINISTRADOR'],
+    items: [
+      { label: 'Meu perfil', path: '/my-profile', queryParams: { view: 'profile' }, roles: ['COMUM', 'SECRETARIO', 'ADMINISTRADOR'] },
+      { label: 'Alterar senha', path: '/my-profile', queryParams: { view: 'password' }, roles: ['COMUM', 'SECRETARIO', 'ADMINISTRADOR'] },
+    ],
+  },
+  {
     id: 'acesso',
     label: 'Acesso e Pessoas',
     roles: ['SECRETARIO', 'ADMINISTRADOR'],
@@ -266,6 +275,7 @@ export class ShellComponent {
   private updatePageTitle(currentPath: string): void {
     if (currentPath.startsWith('/users')) this.pageTitle.set('Usuários');
     else if (currentPath.startsWith('/profiles')) this.pageTitle.set('Perfis');
+    else if (currentPath.startsWith('/my-profile')) this.pageTitle.set('Meu Perfil');
     else if (currentPath.startsWith('/asset-types')) this.pageTitle.set('Tipos de bem');
     else if (currentPath.startsWith('/asset-statuses')) this.pageTitle.set('Status de bem');
     else if (currentPath.startsWith('/asset-materials')) this.pageTitle.set('Materiais');

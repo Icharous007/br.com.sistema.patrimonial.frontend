@@ -40,12 +40,14 @@ body {
 		linear-gradient(180deg, #fbf6ef 0%, #f3ebe1 52%, #f0e8df 100%);
 	color: var(--text);
 	font-family: 'Manrope', sans-serif;
+	overflow-x: hidden;
 }
 
 body {
 	min-height: 100vh;
 	min-height: 100dvh;
 	-webkit-text-size-adjust: 100%;
+	-webkit-tap-highlight-color: transparent;
 }
 
 app-root {
@@ -825,6 +827,19 @@ tbody tr:hover {
 	display: none;
 }
 
+.profile-info-strip {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 8px;
+	margin-bottom: 16px;
+}
+
+.alert-warning {
+	color: #7a5c00;
+	background: #fff8e1;
+	border: 1px solid rgba(122, 92, 0, 0.2);
+}
+
 @media (max-width: 1200px) {
 	.feature-grid,
 	.content-grid.two-columns,
@@ -892,10 +907,34 @@ tbody tr:hover {
 		grid-template-columns: 1fr;
 	}
 
-	.topbar,
-	.topbar-actions,
-	.page-header,
-	.segment-group,
+	.span-2,
+	.asset-layout .span-2 {
+		grid-column: auto;
+	}
+
+	.topbar {
+		flex-direction: column;
+		align-items: stretch;
+	}
+
+	.topbar-actions {
+		justify-content: space-between;
+	}
+
+	.page-header {
+		flex-direction: column;
+		align-items: stretch;
+	}
+
+	.segment-group {
+		flex-wrap: wrap;
+	}
+
+	.segment-button {
+		flex: 1 1 auto;
+		text-align: center;
+	}
+
 	.button-row,
 	.table-actions,
 	.pagination-actions {
@@ -993,7 +1032,7 @@ tbody tr:hover {
 
 @media (max-width: 480px) {
 	.app-shell {
-		gap: 16px;
+		gap: 12px;
 		padding: 12px;
 	}
 
@@ -1014,8 +1053,38 @@ tbody tr:hover {
 		border-radius: 20px;
 	}
 
-	.body,
-	body {
-		overflow-x: hidden;
+	.auth-hero {
+		display: none;
+	}
+
+	.auth-page {
+		min-height: auto;
+		padding-block: 32px;
+	}
+
+	.auth-panel {
+		padding: 18px;
+	}
+
+	.section-heading.compact h2,
+	.page-header h1 {
+		font-size: clamp(1.5rem, 7vw, 2.2rem);
+	}
+
+	.segment-button {
+		padding: 10px 12px;
+		font-size: 0.9rem;
+	}
+
+	.topbar-user strong {
+		font-size: 0.9rem;
+	}
+
+	.input {
+		min-height: 52px;
+	}
+
+	.btn {
+		min-height: 50px;
 	}
 }

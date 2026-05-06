@@ -77,6 +77,14 @@ describe('AssetsApiService', () => {
     req.flush(mockPage);
   });
 
+  it('list() should send assetCode filter query param', () => {
+    service.list({ assetCode: '02.01.0000001' }).subscribe();
+
+    const req = httpTesting.expectOne((r) => r.url === `${BASE}/api/assets`);
+    expect(req.request.params.get('assetCode')).toBe('02.01.0000001');
+    req.flush(mockPage);
+  });
+
   it('list() should send pagination params', () => {
     service.list({}, { page: 1, size: 50 }).subscribe();
 

@@ -25,6 +25,10 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
         void router.navigate(['/login']);
       }
 
+      if (error.status === 428) {
+        void router.navigate(['/my-profile'], { queryParams: { view: 'password' } });
+      }
+
       return throwError(() => error);
     }),
   );

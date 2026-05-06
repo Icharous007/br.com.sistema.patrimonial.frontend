@@ -8,6 +8,7 @@ import { API_BASE_URL, JwtClaims, LoginRequest, LoginResponse, ProfileName } fro
 const ACCESS_TOKEN_KEY = 'accessToken';
 const CLAIMS_KEY = 'authClaims';
 const EXPIRES_AT_KEY = 'tokenExpiresAt';
+const REQUIRE_PASSWORD_CHANGE_KEY = 'requirePasswordChange';
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
@@ -17,12 +18,16 @@ export class AuthService {
   private readonly tokenState = signal<string | null>(localStorage.getItem(ACCESS_TOKEN_KEY));
   private readonly claimsState = signal<JwtClaims | null>(this.readClaims());
   private readonly expiresAtState = signal<number | null>(this.readExpiresAt());
+  private readonly requirePasswordChangeState = signal<boolean>(
+    localStorage.getItem(REQUIRE_PASSWORD_CHANGE_KEY) === 'true',
+  );
 
   readonly token = computed(() => this.tokenState());
   readonly claims = computed(() => this.claimsState());
   readonly profile = computed(() => this.claimsState()?.perfil ?? null);
   readonly userName = computed(() => this.claimsState()?.nome ?? 'Visitante');
   readonly isAuthenticated = computed(() => !!this.tokenState() && !this.hasSessionExpired());
+  readonly requiresPasswordChange = computed(() => this.requirePasswordChangeState());
 
   login(payload: LoginRequest) {
     return this.http.post<LoginResponse>(`${API_BASE_URL}/api/auth/login`, payload).pipe(
@@ -60,6 +65,11 @@ export class AuthService {
     return true;
   }
 
+  clearPasswordChangeRequirement(): void {
+    localStorage.removeItem(REQUIRE_PASSWORD_CHANGE_KEY);
+    this.requirePasswordChangeState.set(false);
+  }
+
   private persistSession(response: LoginResponse): void {
     const claims = this.decodeJwt(response.accessToken);
     const expiresAt = Date.now() + response.expiresInSeconds * 1000;
@@ -67,20 +77,24 @@ export class AuthService {
     localStorage.setItem(ACCESS_TOKEN_KEY, response.accessToken);
     localStorage.setItem(CLAIMS_KEY, JSON.stringify(claims));
     localStorage.setItem(EXPIRES_AT_KEY, String(expiresAt));
+    localStorage.setItem(REQUIRE_PASSWORD_CHANGE_KEY, String(!!response.requirePasswordChange));
 
     this.tokenState.set(response.accessToken);
     this.claimsState.set(claims);
     this.expiresAtState.set(expiresAt);
+    this.requirePasswordChangeState.set(!!response.requirePasswordChange);
   }
 
   private clearSession(): void {
     localStorage.removeItem(ACCESS_TOKEN_KEY);
     localStorage.removeItem(CLAIMS_KEY);
     localStorage.removeItem(EXPIRES_AT_KEY);
+    localStorage.removeItem(REQUIRE_PASSWORD_CHANGE_KEY);
 
     this.tokenState.set(null);
     this.claimsState.set(null);
     this.expiresAtState.set(null);
+    this.requirePasswordChangeState.set(false);
   }
 
   private hasSessionExpired(): boolean {

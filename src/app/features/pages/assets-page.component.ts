@@ -54,6 +54,7 @@ type LookupList = Array<CatalogResponse | CodedCatalogResponse>;
             </div>
 
             <form class="form-grid" [formGroup]="filterForm" (ngSubmit)="searchAssets(true)">
+              <label class="field"><span>Código patrimonial</span><input class="input" type="text" formControlName="assetCode" placeholder="Ex.: 02.01 ou 02.01.0000001" /></label>
               <label class="field"><span>Descrição</span><input class="input" type="text" formControlName="description" /></label>
               <label class="field"><span>Marca</span><input class="input" type="text" formControlName="brand" /></label>
               <label class="field"><span>Modelo</span><input class="input" type="text" formControlName="model" /></label>
@@ -213,6 +214,7 @@ type LookupList = Array<CatalogResponse | CodedCatalogResponse>;
           <div class="report-panel">
             <button type="button" class="btn btn-secondary btn-block" (click)="downloadReport('csv')">Baixar CSV</button>
             <button type="button" class="btn btn-secondary btn-block" (click)="downloadReport('excel')">Baixar Excel</button>
+            <button type="button" class="btn btn-secondary btn-block" (click)="downloadReport('pdf')">Baixar PDF</button>
           </div>
 
           @if (savedAsset()) {
@@ -268,6 +270,7 @@ export class AssetsPageComponent {
   });
 
   readonly filterForm = this.fb.nonNullable.group({
+    assetCode: [''],
     brand: [''],
     model: [''],
     description: [''],
@@ -379,7 +382,7 @@ export class AssetsPageComponent {
 
   clearAssetFilters(): void {
     this.filterForm.reset({
-      brand: '', model: '', description: '', createdFrom: '', disposalDate: '', acquisitionDate: '', invoice: '',
+      assetCode: '', brand: '', model: '', description: '', createdFrom: '', disposalDate: '', acquisitionDate: '', invoice: '',
       material: '', location: '', status: '', color: '', serialNumber: '', manufacturer: '', type: '',
     });
     this.searchAssets(true);
@@ -488,13 +491,13 @@ export class AssetsPageComponent {
     reader.readAsDataURL(file);
   }
 
-  downloadReport(format: 'csv' | 'excel'): void {
+  downloadReport(format: 'csv' | 'excel' | 'pdf'): void {
     this.assetsApi.downloadReport(format).subscribe({
       next: (blob) => {
         const url = URL.createObjectURL(blob);
         const anchor = document.createElement('a');
         anchor.href = url;
-        anchor.download = `bens-patrimoniais.${format === 'csv' ? 'csv' : 'xlsx'}`;
+        anchor.download = `bens-patrimoniais.${format === 'csv' ? 'csv' : format === 'excel' ? 'xlsx' : 'pdf'}`;
         anchor.click();
         URL.revokeObjectURL(url);
       },

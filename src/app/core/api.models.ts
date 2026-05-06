@@ -32,6 +32,31 @@ export interface LoginResponse {
   tokenType: 'Bearer';
   accessToken: string;
   expiresInSeconds: number;
+  refreshToken: string;
+  refreshExpiresInSeconds: number;
+  requirePasswordChange: boolean;
+}
+
+export interface MyProfileRequest {
+  name: string;
+  email: string;
+  phone?: string;
+}
+
+export interface MyProfileResponse {
+  id: number;
+  name: string;
+  cpf: string;
+  email: string;
+  phone?: string;
+  profile: string;
+  active: boolean;
+}
+
+export interface ChangePasswordRequest {
+  currentPassword: string;
+  newPassword: string;
+  confirmNewPassword: string;
 }
 
 export interface JwtClaims {
@@ -136,6 +161,7 @@ export interface AssetResponse {
 }
 
 export interface AssetFilters {
+  assetCode?: string;
   brand?: string;
   model?: string;
   description?: string;

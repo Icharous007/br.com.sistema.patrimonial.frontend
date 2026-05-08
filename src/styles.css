@@ -56,6 +56,26 @@ app-root {
 	min-height: 100dvh;
 }
 
+/* Safe area for notched devices (iPhone, etc.) */
+@supports (padding: max(0px)) {
+	app-root {
+		padding-top: env(safe-area-inset-top);
+		padding-right: env(safe-area-inset-right);
+		padding-bottom: env(safe-area-inset-bottom);
+		padding-left: env(safe-area-inset-left);
+	}
+}
+
+/* Long content like asset codes / serial numbers should wrap on small screens */
+strong,
+td,
+th,
+.tag,
+.menu-link {
+	overflow-wrap: anywhere;
+	word-break: break-word;
+}
+
 button,
 input,
 select,
@@ -298,11 +318,9 @@ p {
 	touch-action: manipulation;
 }
 
-.menu-link:hover,
 .menu-link-active {
 	background: rgba(12, 124, 120, 0.12);
 	color: var(--primary-strong);
-	transform: translateX(2px);
 }
 
 .sidebar-footer {
@@ -561,10 +579,7 @@ small,
 		box-shadow 0.2s ease;
 }
 
-.action-card:hover {
-	transform: translateY(-2px);
-	box-shadow: 0 12px 25px rgba(18, 58, 74, 0.1);
-}
+/* hover state moved to @media (hover: hover) block */
 
 .bullet-list {
 	margin-top: 18px;
@@ -653,8 +668,29 @@ small,
 		box-shadow 0.2s ease;
 }
 
-.btn:hover {
-	transform: translateY(-1px);
+@media (hover: hover) {
+	.btn:hover {
+		transform: translateY(-1px);
+	}
+
+	.action-card:hover {
+		transform: translateY(-2px);
+		box-shadow: 0 12px 25px rgba(18, 58, 74, 0.1);
+	}
+
+	.menu-link:hover {
+		background: rgba(12, 124, 120, 0.12);
+		color: var(--primary-strong);
+		transform: translateX(2px);
+	}
+}
+
+.btn:focus-visible,
+.input:focus-visible,
+.menu-link:focus-visible,
+.segment-button:focus-visible {
+	outline: 3px solid rgba(12, 124, 120, 0.45);
+	outline-offset: 2px;
 }
 
 .btn:disabled {
@@ -810,6 +846,16 @@ tbody tr:hover {
 	border-radius: 14px;
 }
 
+.barcode-frame {
+	text-align: center;
+}
+
+.barcode-frame img {
+	max-width: 100%;
+	height: auto;
+	margin: 0 auto;
+}
+
 .stacked-panels,
 .report-panel,
 .summary-card,
@@ -882,6 +928,21 @@ tbody tr:hover {
 	}
 }
 
+/* Reorder login page on mobile: form first, hero after */
+@media (max-width: 1200px) {
+	.auth-page {
+		grid-template-columns: 1fr;
+	}
+
+	.auth-panel {
+		order: 0;
+	}
+
+	.auth-hero {
+		order: 1;
+	}
+}
+
 @media (max-width: 720px) {
 	.app-shell,
 	.auth-page,
@@ -915,10 +976,22 @@ tbody tr:hover {
 	.topbar {
 		flex-direction: column;
 		align-items: stretch;
+		position: sticky;
+		top: 0;
+		z-index: 5;
 	}
 
 	.topbar-actions {
 		justify-content: space-between;
+	}
+
+	.topbar-user strong,
+	.topbar-user small {
+		display: block;
+		max-width: 56vw;
+		overflow: hidden;
+		text-overflow: ellipsis;
+		white-space: nowrap;
 	}
 
 	.page-header {
@@ -1027,6 +1100,45 @@ tbody tr:hover {
 
 	.menu-dropdown-open {
 		max-height: min(48vh, 420px);
+	}
+}
+
+/* Asset filters collapsible on mobile */
+@media (max-width: 720px) {
+	.collapsible-filters[open] > summary::after {
+		transform: rotate(180deg);
+	}
+}
+
+.collapsible-filters > summary {
+	list-style: none;
+	cursor: pointer;
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 12px;
+	padding: 4px 0 12px;
+	font-weight: 800;
+	color: var(--text);
+}
+
+.collapsible-filters > summary::-webkit-details-marker {
+	display: none;
+}
+
+.collapsible-filters > summary::after {
+	content: '▾';
+	color: var(--primary);
+	transition: transform 0.2s ease;
+}
+
+@media (min-width: 721px) {
+	.collapsible-filters > summary {
+		display: none;
+	}
+
+	.collapsible-filters > .collapsible-body {
+		display: block !important;
 	}
 }
 

@@ -53,6 +53,9 @@ type LookupList = Array<CatalogResponse | CodedCatalogResponse>;
               <h2>Listar e localizar bens</h2>
             </div>
 
+            <details class="collapsible-filters" [open]="true">
+              <summary>Filtros</summary>
+              <div class="collapsible-body">
             <form class="form-grid" [formGroup]="filterForm" (ngSubmit)="searchAssets(true)">
               <label class="field"><span>Código patrimonial</span><input class="input" type="text" formControlName="assetCode" placeholder="Ex.: 02.01 ou 02.01.0000001" /></label>
               <label class="field"><span>Descrição</span><input class="input" type="text" formControlName="description" /></label>
@@ -86,6 +89,8 @@ type LookupList = Array<CatalogResponse | CodedCatalogResponse>;
                 <button type="button" class="btn btn-ghost" (click)="clearAssetFilters()">Limpar</button>
               </div>
             </form>
+              </div>
+            </details>
           </article>
         }
 
@@ -124,7 +129,7 @@ type LookupList = Array<CatalogResponse | CodedCatalogResponse>;
               <label class="field"><span>Status</span><select class="input" formControlName="assetStatusId"><option [ngValue]="0">Selecione</option>@for (item of assetStatuses(); track item.id) {<option [ngValue]="item.id">{{ item.description }}</option>}</select></label>
               <label class="field"><span>Material</span><select class="input" formControlName="assetMaterialId"><option [ngValue]="0">Selecione</option>@for (item of assetMaterials(); track item.id) {<option [ngValue]="item.id">{{ item.description }}</option>}</select></label>
               <label class="field span-2"><span>Localização</span><select class="input" formControlName="assetLocationId"><option [ngValue]="0">Selecione</option>@for (item of assetLocations(); track item.id) {<option [ngValue]="item.id">{{ item.description }} @if (hasCode(item)) {({{ item.code }})}</option>}</select></label>
-              <label class="field span-2"><span>Foto do bem</span><input class="input" type="file" accept="image/*" (change)="handlePhotoSelection($event)" /></label>
+              <label class="field span-2"><span>Foto do bem</span><input class="input" type="file" accept="image/*" capture="environment" (change)="handlePhotoSelection($event)" /></label>
 
               @if (photoPreview()) {
                 <div class="media-preview span-2"><img [src]="photoPreview()" alt="Prévia do bem" /></div>
@@ -497,7 +502,12 @@ export class AssetsPageComponent {
         const url = URL.createObjectURL(blob);
         const anchor = document.createElement('a');
         anchor.href = url;
-        anchor.download = `bens-patrimoniais.${format === 'csv' ? 'csv' : format === 'excel' ? 'xlsx' : 'pdf'}`;
+        const fileNames: Record<'csv' | 'excel' | 'pdf', string> = {
+          csv: 'bens.csv',
+          excel: 'bens.xlsx',
+          pdf: 'etiquetas.pdf',
+        };
+        anchor.download = fileNames[format];
         anchor.click();
         URL.revokeObjectURL(url);
       },

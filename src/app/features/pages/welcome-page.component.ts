@@ -57,8 +57,9 @@ import { AuthService } from '../../core/auth/auth.service';
             <div>Login com JWT e redirecionamento por rota protegida.</div>
             <div>Menu em cascata com dropdown por módulo e função.</div>
             <div>CRUD de usuários, perfis, catálogos auxiliares e bens.</div>
-            <div>Listagens com filtros, formulários integrados e relatórios CSV/Excel.</div>
+            <div>Listagens com filtros, formulários integrados e relatórios CSV/Excel/PDF.</div>
             <div>Seleções de bens abastecidas via endpoints auxiliares.</div>
+            <div>Auditoria de ações para o perfil ADMINISTRADOR.</div>
           </div>
         </article>
       </section>
@@ -69,9 +70,9 @@ export class WelcomePageComponent {
   readonly auth = inject(AuthService);
 
   readonly metrics = [
-    { label: 'Módulos', value: '8' },
-    { label: 'Endpoints mapeados', value: '18+' },
-    { label: 'Relatórios', value: '2 formatos' },
+    { label: 'Módulos', value: '9' },
+    { label: 'Endpoints mapeados', value: '20+' },
+    { label: 'Relatórios', value: '3 formatos' },
   ];
 
   readonly quickActions = computed(() => {
@@ -103,6 +104,13 @@ export class WelcomePageComponent {
         description: 'Ajuste os perfis funcionais habilitados no sistema.',
         path: '/profiles',
         queryParams: { view: 'create' },
+        roles: ['ADMINISTRADOR'],
+      },
+      {
+        label: 'Auditoria',
+        description: 'Acompanhe o histórico de criação, atualização e exclusão de registros.',
+        path: '/audit-logs',
+        queryParams: undefined,
         roles: ['ADMINISTRADOR'],
       },
     ];

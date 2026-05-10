@@ -7,6 +7,7 @@ import { roleGuard } from './core/guards/role.guard';
 import { LoginPageComponent } from './features/auth/login-page.component';
 import { ShellComponent } from './features/layout/shell.component';
 import { AssetsPageComponent } from './features/pages/assets-page.component';
+import { AuditLogsPageComponent } from './features/pages/audit-logs-page.component';
 import { CatalogPageComponent } from './features/pages/catalog-page.component';
 import { MyProfilePageComponent } from './features/pages/my-profile-page.component';
 import { ProfilesPageComponent } from './features/pages/profiles-page.component';
@@ -119,6 +120,14 @@ export const routes: Routes = [
 				canActivate: [roleGuard],
 				data: {
 					roles: ALL_PROFILES,
+				},
+			},
+			{
+				path: 'audit-logs',
+				component: AuditLogsPageComponent,
+				canActivate: [roleGuard],
+				data: {
+					roles: ['ADMINISTRADOR'],
 				},
 			},
 			{

@@ -178,6 +178,31 @@ export interface AssetFilters {
   type?: string;
 }
 
+export type AuditAction = 'CREATE' | 'UPDATE' | 'DELETE' | string;
+
+export interface AuditLogResponse {
+  id: number;
+  userCpf?: string;
+  userName?: string;
+  userProfile?: ProfileName | string;
+  action: AuditAction;
+  entityName: string;
+  entityId?: string;
+  details?: string;
+  createdAt: string;
+}
+
+export interface AuditLogFilters {
+  action?: string;
+  entityName?: string;
+  entityId?: string;
+  userCpf?: string;
+  userName?: string;
+  userProfile?: string;
+  dateFrom?: string;
+  dateTo?: string;
+}
+
 export type CatalogEndpoint =
   | 'colors'
   | 'asset-types'

@@ -82,6 +82,14 @@ const MENU_SECTIONS: MenuSection[] = [
       { label: 'Relatórios', path: '/assets', queryParams: { view: 'reports' }, roles: ['COMUM', 'SECRETARIO', 'ADMINISTRADOR'] },
     ],
   },
+  {
+    id: 'auditoria',
+    label: 'Auditoria',
+    roles: ['ADMINISTRADOR'],
+    items: [
+      { label: 'Logs de auditoria', path: '/audit-logs', roles: ['ADMINISTRADOR'] },
+    ],
+  },
 ];
 
 @Component({
@@ -282,6 +290,7 @@ export class ShellComponent {
     else if (currentPath.startsWith('/asset-locations')) this.pageTitle.set('Localizações');
     else if (currentPath.startsWith('/colors')) this.pageTitle.set('Cores');
     else if (currentPath.startsWith('/assets')) this.pageTitle.set('Bens patrimoniais');
+    else if (currentPath.startsWith('/audit-logs')) this.pageTitle.set('Auditoria');
     else this.pageTitle.set('Boas-vindas');
   }
 

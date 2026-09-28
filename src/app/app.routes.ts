@@ -4,38 +4,32 @@ import { ALL_PROFILES } from './core/api.models';
 import { authGuard } from './core/guards/auth.guard';
 import { guestGuard } from './core/guards/guest.guard';
 import { roleGuard } from './core/guards/role.guard';
-import { LoginPageComponent } from './features/auth/login-page.component';
-import { ShellComponent } from './features/layout/shell.component';
-import { AssetsPageComponent } from './features/pages/assets-page.component';
-import { AuditLogsPageComponent } from './features/pages/audit-logs-page.component';
-import { CatalogPageComponent } from './features/pages/catalog-page.component';
-import { MyProfilePageComponent } from './features/pages/my-profile-page.component';
-import { ProfilesPageComponent } from './features/pages/profiles-page.component';
-import { UsersPageComponent } from './features/pages/users-page.component';
-import { WelcomePageComponent } from './features/pages/welcome-page.component';
 
 export const routes: Routes = [
 	{
 		path: 'login',
-		component: LoginPageComponent,
+		loadComponent: () => import('./features/auth/login-page.component').then((m) => m.LoginPageComponent),
 		canActivate: [guestGuard],
 	},
 	{
 		path: '',
-		component: ShellComponent,
+		loadComponent: () => import('./features/layout/shell.component').then((m) => m.ShellComponent),
 		canActivate: [authGuard],
 		children: [
 			{
 				path: 'welcome',
-				component: WelcomePageComponent,
+				loadComponent: () =>
+					import('./features/pages/welcome-page.component').then((m) => m.WelcomePageComponent),
 			},
 			{
 				path: 'my-profile',
-				component: MyProfilePageComponent,
+				loadComponent: () =>
+					import('./features/pages/my-profile-page.component').then((m) => m.MyProfilePageComponent),
 			},
 			{
 				path: 'users',
-				component: UsersPageComponent,
+				loadComponent: () =>
+					import('./features/pages/users-page.component').then((m) => m.UsersPageComponent),
 				canActivate: [roleGuard],
 				data: {
 					roles: ['SECRETARIO', 'ADMINISTRADOR'],
@@ -43,7 +37,8 @@ export const routes: Routes = [
 			},
 			{
 				path: 'profiles',
-				component: ProfilesPageComponent,
+				loadComponent: () =>
+					import('./features/pages/profiles-page.component').then((m) => m.ProfilesPageComponent),
 				canActivate: [roleGuard],
 				data: {
 					roles: ['ADMINISTRADOR'],
@@ -51,12 +46,13 @@ export const routes: Routes = [
 			},
 			{
 				path: 'colors',
-				component: CatalogPageComponent,
+				loadComponent: () =>
+					import('./features/pages/catalog-page.component').then((m) => m.CatalogPageComponent),
 				canActivate: [roleGuard],
 				data: {
 					roles: ALL_PROFILES,
 					title: 'Cores',
-					subtitle: 'Controle das cores utilizadas no cadastro patrimonial.',
+					subtitle: 'Cores usadas na identificação dos bens da paróquia.',
 					singularLabel: 'cor',
 					endpoint: 'colors',
 					coded: false,
@@ -64,12 +60,13 @@ export const routes: Routes = [
 			},
 			{
 				path: 'asset-types',
-				component: CatalogPageComponent,
+				loadComponent: () =>
+					import('./features/pages/catalog-page.component').then((m) => m.CatalogPageComponent),
 				canActivate: [roleGuard],
 				data: {
 					roles: ALL_PROFILES,
 					title: 'Tipos de bem',
-					subtitle: 'Padronize os tipos e códigos estruturais dos bens patrimoniais.',
+					subtitle: 'Tipos e códigos estruturais dos bens (imóvel, móvel, bem de uso).',
 					singularLabel: 'tipo',
 					endpoint: 'asset-types',
 					coded: true,
@@ -77,12 +74,13 @@ export const routes: Routes = [
 			},
 			{
 				path: 'asset-statuses',
-				component: CatalogPageComponent,
+				loadComponent: () =>
+					import('./features/pages/catalog-page.component').then((m) => m.CatalogPageComponent),
 				canActivate: [roleGuard],
 				data: {
 					roles: ALL_PROFILES,
 					title: 'Status de bem',
-					subtitle: 'Administre os estágios de uso, baixa e disponibilidade dos bens.',
+					subtitle: 'Estágios de uso, avaria, doação e baixa dos bens.',
 					singularLabel: 'status',
 					endpoint: 'asset-statuses',
 					coded: false,
@@ -90,12 +88,13 @@ export const routes: Routes = [
 			},
 			{
 				path: 'asset-materials',
-				component: CatalogPageComponent,
+				loadComponent: () =>
+					import('./features/pages/catalog-page.component').then((m) => m.CatalogPageComponent),
 				canActivate: [roleGuard],
 				data: {
 					roles: ALL_PROFILES,
 					title: 'Materiais',
-					subtitle: 'Catálogo de materiais aplicados aos itens cadastrados.',
+					subtitle: 'Materiais aplicados aos itens cadastrados.',
 					singularLabel: 'material',
 					endpoint: 'asset-materials',
 					coded: false,
@@ -103,12 +102,13 @@ export const routes: Routes = [
 			},
 			{
 				path: 'asset-locations',
-				component: CatalogPageComponent,
+				loadComponent: () =>
+					import('./features/pages/catalog-page.component').then((m) => m.CatalogPageComponent),
 				canActivate: [roleGuard],
 				data: {
 					roles: ALL_PROFILES,
 					title: 'Localizações',
-					subtitle: 'Mapeie prédios, salas e setores com código identificador.',
+					subtitle: 'Salas e setores da paróquia, com código identificador.',
 					singularLabel: 'localização',
 					endpoint: 'asset-locations',
 					coded: true,
@@ -116,7 +116,8 @@ export const routes: Routes = [
 			},
 			{
 				path: 'assets',
-				component: AssetsPageComponent,
+				loadComponent: () =>
+					import('./features/pages/assets-page.component').then((m) => m.AssetsPageComponent),
 				canActivate: [roleGuard],
 				data: {
 					roles: ALL_PROFILES,
@@ -124,7 +125,8 @@ export const routes: Routes = [
 			},
 			{
 				path: 'audit-logs',
-				component: AuditLogsPageComponent,
+				loadComponent: () =>
+					import('./features/pages/audit-logs-page.component').then((m) => m.AuditLogsPageComponent),
 				canActivate: [roleGuard],
 				data: {
 					roles: ['ADMINISTRADOR'],

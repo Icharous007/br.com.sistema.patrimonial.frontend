@@ -20,9 +20,9 @@ import { formatCpf, sanitizeCpf } from '../../shared/utils/cpf.utils';
     <section class="page-stack">
       <div class="page-header card-soft">
         <div class="section-heading compact">
-          <p class="eyebrow">Endpoint /api/users</p>
+          <p class="eyebrow">Secretaria</p>
           <h1>Usuários</h1>
-          <p>Listagem filtrável, cadastro completo e atualização de usuários vinculados aos perfis da API.</p>
+          <p>Quem acessa o sistema patrimonial da paróquia, com perfil e dados de contato.</p>
         </div>
 
         <div class="segment-group">

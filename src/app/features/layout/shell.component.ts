@@ -5,6 +5,7 @@ import { filter } from 'rxjs';
 
 import { MenuItem, MenuSection } from '../../core/api.models';
 import { AuthService } from '../../core/auth/auth.service';
+import { profileLabel } from '../../shared/utils/profile.utils';
 
 const MENU_SECTIONS: MenuSection[] = [
   {
@@ -12,12 +13,12 @@ const MENU_SECTIONS: MenuSection[] = [
     label: 'Início',
     roles: ['COMUM', 'SECRETARIO', 'ADMINISTRADOR'],
     items: [
-      { label: 'Boas-vindas', path: '/welcome', roles: ['COMUM', 'SECRETARIO', 'ADMINISTRADOR'] },
+      { label: 'Início', path: '/welcome', roles: ['COMUM', 'SECRETARIO', 'ADMINISTRADOR'] },
     ],
   },
   {
     id: 'minha-conta',
-    label: 'Minha Conta',
+    label: 'Minha conta',
     roles: ['COMUM', 'SECRETARIO', 'ADMINISTRADOR'],
     items: [
       { label: 'Meu perfil', path: '/my-profile', queryParams: { view: 'profile' }, roles: ['COMUM', 'SECRETARIO', 'ADMINISTRADOR'] },
@@ -26,50 +27,31 @@ const MENU_SECTIONS: MenuSection[] = [
   },
   {
     id: 'acesso',
-    label: 'Acesso e Pessoas',
+    label: 'Pessoas',
     roles: ['SECRETARIO', 'ADMINISTRADOR'],
     items: [
       {
-        label: 'Listar usuários',
+        label: 'Usuários',
         path: '/users',
-        queryParams: { view: 'list' },
         roles: ['SECRETARIO', 'ADMINISTRADOR'],
       },
       {
-        label: 'Cadastrar usuário',
-        path: '/users',
-        queryParams: { view: 'create' },
-        roles: ['SECRETARIO', 'ADMINISTRADOR'],
-      },
-      {
-        label: 'Gerenciar perfis',
+        label: 'Perfis',
         path: '/profiles',
-        queryParams: { view: 'list' },
-        roles: ['ADMINISTRADOR'],
-      },
-      {
-        label: 'Cadastrar perfil',
-        path: '/profiles',
-        queryParams: { view: 'create' },
         roles: ['ADMINISTRADOR'],
       },
     ],
   },
   {
     id: 'catalogos',
-    label: 'Cadastros Auxiliares',
+    label: 'Cadastros',
     roles: ['COMUM', 'SECRETARIO', 'ADMINISTRADOR'],
     items: [
-      { label: 'Cores', path: '/colors', queryParams: { view: 'list' }, roles: ['COMUM', 'SECRETARIO', 'ADMINISTRADOR'] },
-      { label: 'Nova cor', path: '/colors', queryParams: { view: 'create' }, roles: ['COMUM', 'SECRETARIO', 'ADMINISTRADOR'] },
-      { label: 'Tipos de bem', path: '/asset-types', queryParams: { view: 'list' }, roles: ['COMUM', 'SECRETARIO', 'ADMINISTRADOR'] },
-      { label: 'Novo tipo', path: '/asset-types', queryParams: { view: 'create' }, roles: ['COMUM', 'SECRETARIO', 'ADMINISTRADOR'] },
-      { label: 'Status de bem', path: '/asset-statuses', queryParams: { view: 'list' }, roles: ['COMUM', 'SECRETARIO', 'ADMINISTRADOR'] },
-      { label: 'Novo status', path: '/asset-statuses', queryParams: { view: 'create' }, roles: ['COMUM', 'SECRETARIO', 'ADMINISTRADOR'] },
-      { label: 'Materiais', path: '/asset-materials', queryParams: { view: 'list' }, roles: ['COMUM', 'SECRETARIO', 'ADMINISTRADOR'] },
-      { label: 'Novo material', path: '/asset-materials', queryParams: { view: 'create' }, roles: ['COMUM', 'SECRETARIO', 'ADMINISTRADOR'] },
-      { label: 'Localizações', path: '/asset-locations', queryParams: { view: 'list' }, roles: ['COMUM', 'SECRETARIO', 'ADMINISTRADOR'] },
-      { label: 'Nova localização', path: '/asset-locations', queryParams: { view: 'create' }, roles: ['COMUM', 'SECRETARIO', 'ADMINISTRADOR'] },
+      { label: 'Cores', path: '/colors', roles: ['COMUM', 'SECRETARIO', 'ADMINISTRADOR'] },
+      { label: 'Tipos de bem', path: '/asset-types', roles: ['COMUM', 'SECRETARIO', 'ADMINISTRADOR'] },
+      { label: 'Status de bem', path: '/asset-statuses', roles: ['COMUM', 'SECRETARIO', 'ADMINISTRADOR'] },
+      { label: 'Materiais', path: '/asset-materials', roles: ['COMUM', 'SECRETARIO', 'ADMINISTRADOR'] },
+      { label: 'Localizações', path: '/asset-locations', roles: ['COMUM', 'SECRETARIO', 'ADMINISTRADOR'] },
     ],
   },
   {
@@ -77,9 +59,7 @@ const MENU_SECTIONS: MenuSection[] = [
     label: 'Patrimônio',
     roles: ['COMUM', 'SECRETARIO', 'ADMINISTRADOR'],
     items: [
-      { label: 'Consultar bens', path: '/assets', queryParams: { view: 'list' }, roles: ['COMUM', 'SECRETARIO', 'ADMINISTRADOR'] },
-      { label: 'Cadastrar bem', path: '/assets', queryParams: { view: 'create' }, roles: ['COMUM', 'SECRETARIO', 'ADMINISTRADOR'] },
-      { label: 'Relatórios', path: '/assets', queryParams: { view: 'reports' }, roles: ['COMUM', 'SECRETARIO', 'ADMINISTRADOR'] },
+      { label: 'Bens', path: '/assets', roles: ['COMUM', 'SECRETARIO', 'ADMINISTRADOR'] },
     ],
   },
   {
@@ -87,7 +67,7 @@ const MENU_SECTIONS: MenuSection[] = [
     label: 'Auditoria',
     roles: ['ADMINISTRADOR'],
     items: [
-      { label: 'Logs de auditoria', path: '/audit-logs', roles: ['ADMINISTRADOR'] },
+      { label: 'Histórico de ações', path: '/audit-logs', roles: ['ADMINISTRADOR'] },
     ],
   },
 ];
@@ -108,9 +88,9 @@ const MENU_SECTIONS: MenuSection[] = [
 
       <aside class="sidebar" [class.sidebar-open]="menuOpen()">
         <div class="brand-block">
-          <div class="brand-mark">SP</div>
+          <img class="brand-logo" src="/logo.jpg" width="56" height="56" alt="Brasão da Paróquia São Francisco de Assis" />
           <div>
-            <p class="eyebrow">Painel Operacional</p>
+            <p class="eyebrow">Paróquia São Francisco de Assis</p>
             <h1>Sistema Patrimonial</h1>
           </div>
         </div>
@@ -154,7 +134,8 @@ const MENU_SECTIONS: MenuSection[] = [
         <div class="sidebar-footer card-soft">
           <p class="sidebar-footer-label">Sessão ativa</p>
           <strong>{{ auth.userName() }}</strong>
-          <span>{{ auth.profile() }}</span>
+          <span>{{ profileLabel(auth.profile()) }}</span>
+          <span class="motto">Pax et Bonum</span>
           <button type="button" class="btn btn-secondary btn-block" (click)="logout()">Sair</button>
         </div>
       </aside>
@@ -162,7 +143,7 @@ const MENU_SECTIONS: MenuSection[] = [
       <div class="app-main">
         <header class="topbar card-soft">
           <div>
-            <p class="eyebrow">Gestão integrada</p>
+            <p class="eyebrow">Secretaria paroquial</p>
             <h2>{{ pageTitle() }}</h2>
           </div>
 
@@ -171,7 +152,7 @@ const MENU_SECTIONS: MenuSection[] = [
               <span class="avatar-chip">{{ initials() }}</span>
               <div>
                 <strong>{{ auth.userName() }}</strong>
-                <small>{{ auth.profile() }}</small>
+                <small>{{ profileLabel(auth.profile()) }}</small>
               </div>
             </div>
             <button
@@ -205,7 +186,8 @@ export class ShellComponent {
       items: section.items.filter((item) => this.canAccess(item)),
     })),
   );
-  readonly pageTitle = signal('Boas-vindas');
+  readonly pageTitle = signal('Início');
+  readonly profileLabel = profileLabel;
 
   constructor() {
     this.syncPageContext(this.router.url);
@@ -263,13 +245,11 @@ export class ShellComponent {
     const currentPath = this.normalizePath(url);
     this.updatePageTitle(currentPath);
 
-    // Keep menu sections open only when user selected them and route belongs to that section.
-    this.openSections.update((state) => {
+    this.openSections.update(() => {
       const nextState = this.closedSectionsState();
 
       this.visibleSections().forEach((section) => {
-        const routeBelongsToSection = section.items.some((item) => item.path === currentPath);
-        nextState[section.id] = !!state[section.id] && routeBelongsToSection;
+        nextState[section.id] = section.items.some((item) => item.path === currentPath);
       });
 
       return nextState;
@@ -291,7 +271,7 @@ export class ShellComponent {
     else if (currentPath.startsWith('/colors')) this.pageTitle.set('Cores');
     else if (currentPath.startsWith('/assets')) this.pageTitle.set('Bens patrimoniais');
     else if (currentPath.startsWith('/audit-logs')) this.pageTitle.set('Auditoria');
-    else this.pageTitle.set('Boas-vindas');
+    else this.pageTitle.set('Início');
   }
 
   private closedSectionsState(): Record<string, boolean> {

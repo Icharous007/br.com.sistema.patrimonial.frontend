@@ -30,6 +30,7 @@ const fakeLoginResponse: LoginResponse = {
   tokenType: 'Bearer',
   accessToken: fakeToken,
   expiresInSeconds: 3600,
+  requirePasswordChange: false,
 };
 
 @Component({ standalone: true, template: '' })
@@ -40,8 +41,6 @@ describe('AuthService', () => {
   let httpTesting: HttpTestingController;
 
   beforeEach(() => {
-    localStorage.clear();
-
     TestBed.configureTestingModule({
       providers: [
         provideHttpClient(),
@@ -56,7 +55,6 @@ describe('AuthService', () => {
 
   afterEach(() => {
     httpTesting.verify();
-    localStorage.clear();
   });
 
   // ── Initial state ──────────────────────────────────────────────────────────
@@ -65,7 +63,7 @@ describe('AuthService', () => {
     expect(service).toBeTruthy();
   });
 
-  it('should start unauthenticated when localStorage is empty', () => {
+  it('should start unauthenticated with no in-memory token', () => {
     expect(service.isAuthenticated()).toBe(false);
     expect(service.token()).toBeNull();
     expect(service.claims()).toBeNull();
@@ -75,18 +73,18 @@ describe('AuthService', () => {
 
   // ── login() ────────────────────────────────────────────────────────────────
 
-  it('should persist session and mark authenticated after successful login', () => {
+  it('should persist session in memory and mark authenticated after successful login', () => {
     service.login({ cpf: '12345678901', password: 'secret' }).subscribe();
 
     const req = httpTesting.expectOne('http://localhost:8080/api/auth/login');
     expect(req.request.method).toBe('POST');
+    expect(req.request.withCredentials).toBe(true);
     req.flush(fakeLoginResponse);
 
     expect(service.isAuthenticated()).toBe(true);
     expect(service.token()).toBe(fakeToken);
     expect(service.profile()).toBe('ADMINISTRADOR');
     expect(service.userName()).toBe('Admin User');
-    expect(localStorage.getItem('accessToken')).toBe(fakeToken);
   });
 
   it('should propagate HTTP errors from login', () => {
@@ -102,25 +100,67 @@ describe('AuthService', () => {
     expect(service.isAuthenticated()).toBe(false);
   });
 
+  // ── refresh() / restoreSession() ───────────────────────────────────────────
+
+  it('refresh() should exchange the HttpOnly cookie for a new access token', () => {
+    let resolvedToken: string | null = null;
+    service.refresh().subscribe((token) => (resolvedToken = token));
+
+    const req = httpTesting.expectOne('http://localhost:8080/api/auth/refresh');
+    expect(req.request.withCredentials).toBe(true);
+    req.flush(fakeLoginResponse);
+
+    expect(resolvedToken).toBe(fakeToken);
+    expect(service.isAuthenticated()).toBe(true);
+  });
+
+  it('refresh() should share a single in-flight request across concurrent callers', () => {
+    let firstToken: string | null = null;
+    let secondToken: string | null = null;
+    service.refresh().subscribe((token) => (firstToken = token));
+    service.refresh().subscribe((token) => (secondToken = token));
+
+    const req = httpTesting.expectOne('http://localhost:8080/api/auth/refresh');
+    req.flush(fakeLoginResponse);
+
+    expect(firstToken).toBe(fakeToken);
+    expect(secondToken).toBe(fakeToken);
+  });
+
+  it('restoreSession() should resolve false and clear state when there is no valid refresh cookie', () => {
+    let restored: boolean | null = null;
+    service.restoreSession().subscribe((ok) => (restored = ok));
+
+    const req = httpTesting.expectOne('http://localhost:8080/api/auth/refresh');
+    req.flush({ message: 'Refresh token invalido.' }, { status: 401, statusText: 'Unauthorized' });
+
+    expect(restored).toBe(false);
+    expect(service.isAuthenticated()).toBe(false);
+  });
+
   // ── logout() ───────────────────────────────────────────────────────────────
 
-  it('should clear session on logout', () => {
-    localStorage.setItem('accessToken', fakeToken);
-    localStorage.setItem('authClaims', JSON.stringify(adminClaims));
-    localStorage.setItem('tokenExpiresAt', String(Date.now() + 3_600_000));
+  it('should clear in-memory session after logout completes', () => {
+    service.login({ cpf: '12345678901', password: 'x' }).subscribe();
+    httpTesting.expectOne('http://localhost:8080/api/auth/login').flush(fakeLoginResponse);
 
-    // Re-create service so it reads the pre-seeded localStorage
-    TestBed.resetTestingModule();
-    TestBed.configureTestingModule({
-      providers: [provideHttpClient(), provideHttpClientTesting(), provideRouter([{ path: 'login', component: DummyComponent }, { path: 'welcome', component: DummyComponent }])],
-    });
-    const freshService = TestBed.inject(AuthService);
+    service.logout(false);
+    httpTesting.expectOne('http://localhost:8080/api/auth/logout').flush(null);
 
-    freshService.logout(false);
+    expect(service.isAuthenticated()).toBe(false);
+    expect(service.token()).toBeNull();
+  });
 
-    expect(freshService.isAuthenticated()).toBe(false);
-    expect(freshService.token()).toBeNull();
-    expect(localStorage.getItem('accessToken')).toBeNull();
+  it('should clear in-memory session even when the logout request fails', () => {
+    service.login({ cpf: '12345678901', password: 'x' }).subscribe();
+    httpTesting.expectOne('http://localhost:8080/api/auth/login').flush(fakeLoginResponse);
+
+    service.logout(false);
+    httpTesting
+      .expectOne('http://localhost:8080/api/auth/logout')
+      .flush({ message: 'error' }, { status: 500, statusText: 'Server Error' });
+
+    expect(service.isAuthenticated()).toBe(false);
   });
 
   // ── hasAnyRole() / hasRole() ───────────────────────────────────────────────
@@ -159,11 +199,12 @@ describe('AuthService', () => {
     expect(service.ensureValidSession()).toBe(true);
   });
 
-  it('ensureValidSession should return false and logout when token is expired', () => {
+  it('ensureValidSession should return false and clear session when token is expired', () => {
     const expiredResponse: LoginResponse = {
       tokenType: 'Bearer',
       accessToken: fakeExpiredToken,
       expiresInSeconds: -1,
+      requirePasswordChange: false,
     };
 
     service.login({ cpf: '12345678901', password: 'x' }).subscribe();
@@ -173,24 +214,5 @@ describe('AuthService', () => {
 
     expect(result).toBe(false);
     expect(service.isAuthenticated()).toBe(false);
-  });
-
-  // ── localStorage restoration ───────────────────────────────────────────────
-
-  it('should restore session from localStorage on initialization', () => {
-    localStorage.setItem('accessToken', fakeToken);
-    localStorage.setItem('authClaims', JSON.stringify(adminClaims));
-    localStorage.setItem('tokenExpiresAt', String(Date.now() + 3_600_000));
-
-    TestBed.resetTestingModule();
-    TestBed.configureTestingModule({
-      providers: [provideHttpClient(), provideHttpClientTesting(), provideRouter([{ path: 'login', component: DummyComponent }, { path: 'welcome', component: DummyComponent }])],
-    });
-    const restored = TestBed.inject(AuthService);
-
-    expect(restored.token()).toBe(fakeToken);
-    expect(restored.profile()).toBe('ADMINISTRADOR');
-    expect(restored.userName()).toBe('Admin User');
-    expect(restored.isAuthenticated()).toBe(true);
   });
 });

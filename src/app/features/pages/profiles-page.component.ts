@@ -17,9 +17,9 @@ import { ProfilesApiService } from '../../core/services/profiles-api.service';
     <section class="page-stack">
       <div class="page-header card-soft">
         <div class="section-heading compact">
-          <p class="eyebrow">Endpoint /api/profiles</p>
+          <p class="eyebrow">Acesso</p>
           <h1>Perfis</h1>
-          <p>Gestão do conjunto de perfis funcionais que controlam acesso e experiência do usuário.</p>
+          <p>Papéis que definem o que cada pessoa pode consultar ou alterar no inventário.</p>
         </div>
 
         <div class="segment-group">

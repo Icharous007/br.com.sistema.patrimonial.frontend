@@ -146,7 +146,7 @@ describe('LoginPageComponent', () => {
     component.loginForm.setValue({ cpf: '123.456.789-01', password: 'abc' });
     component.submit();
 
-    expect(component.errorMessage()).toContain('backend');
+    expect(component.errorMessage()).toContain('conectar ao servidor');
   });
 
   it('submit() should display string error body directly', () => {

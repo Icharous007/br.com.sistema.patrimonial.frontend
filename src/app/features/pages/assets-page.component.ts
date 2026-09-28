@@ -29,9 +29,9 @@ type LookupList = Array<CatalogResponse | CodedCatalogResponse>;
     <section class="page-stack">
       <div class="page-header card-soft">
         <div class="section-heading compact">
-          <p class="eyebrow">Endpoint /api/assets</p>
-          <h1>Bens patrimoniais</h1>
-          <p>Cadastro completo, filtros detalhados, relatórios e integração com catálogos auxiliares.</p>
+          <p class="eyebrow">Inventário</p>
+          <h1>Bens patrimoniais da paróquia</h1>
+          <p>Cadastre, localize e emita etiquetas dos bens da comunidade.</p>
         </div>
 
         <div class="segment-group wrap">
@@ -53,7 +53,15 @@ type LookupList = Array<CatalogResponse | CodedCatalogResponse>;
               <h2>Listar e localizar bens</h2>
             </div>
 
-            <details class="collapsible-filters" [open]="true">
+            @if (activeFilterChips().length) {
+              <div class="filter-chips">
+                @for (chip of activeFilterChips(); track chip.key) {
+                  <span class="tag">{{ chip.label }}: {{ chip.value }}</span>
+                }
+              </div>
+            }
+
+            <details class="collapsible-filters">
               <summary>Filtros</summary>
               <div class="collapsible-body">
             <form class="form-grid" [formGroup]="filterForm" (ngSubmit)="searchAssets(true)">
@@ -146,7 +154,7 @@ type LookupList = Array<CatalogResponse | CodedCatalogResponse>;
         @if (viewMode() !== 'reports') {
           <article class="card-soft span-2">
             <div class="section-heading compact">
-              <p class="eyebrow">Listagem retornada</p>
+              <p class="eyebrow">Inventário</p>
               <h2>Bens encontrados</h2>
             </div>
 
@@ -157,7 +165,7 @@ type LookupList = Array<CatalogResponse | CodedCatalogResponse>;
                     <th>Bem</th>
                     <th>Qtd.</th>
                     <th>Código</th>
-                    <th>Classificação</th>
+                    <th>Local e status</th>
                     <th>Valor</th>
                     <th>Ações</th>
                   </tr>
@@ -166,15 +174,21 @@ type LookupList = Array<CatalogResponse | CodedCatalogResponse>;
                   @for (asset of assets(); track asset.id) {
                     <tr>
                       <td data-label="Bem">
-                        <strong>{{ asset.description }}</strong>
-                        <small>{{ asset.brand }} {{ asset.model }}</small>
+                        <div class="asset-cell">
+                          <span class="asset-thumb asset-thumb-placeholder" aria-hidden="true">PSFA</span>
+                          <div>
+                            <strong>{{ asset.description }}</strong>
+                            <small>{{ asset.brand }} {{ asset.model }}</small>
+                          </div>
+                        </div>
                       </td>
                       <td data-label="Qtd.">{{ asset.quantity }}</td>
-                      <td data-label="Código">{{ asset.assetCode }}</td>
-                      <td data-label="Classificação">
+                      <td data-label="Código"><span class="tag tag-gold">{{ asset.assetCode }}</span></td>
+                      <td data-label="Local e status">
                         <div class="stacked-inline">
-                          <span>{{ asset.assetType || '-' }}</span>
-                          <small>{{ asset.assetLocation || '-' }} • {{ asset.assetStatus || '-' }}</small>
+                          <span>{{ asset.assetLocation || '-' }}</span>
+                          <span [class]="'tag ' + statusTagClass(asset.assetStatus)">{{ asset.assetStatus || '-' }}</span>
+                          <small>{{ asset.assetType || '-' }}</small>
                         </div>
                       </td>
                       <td data-label="Valor">{{ asset.acquisitionValue || 0 | currency: 'BRL' : 'symbol' : '1.2-2' : 'pt-BR' }}</td>
@@ -186,7 +200,16 @@ type LookupList = Array<CatalogResponse | CodedCatalogResponse>;
                       </td>
                     </tr>
                   } @empty {
-                    <tr><td colspan="6" class="empty-state">Nenhum bem retornado com os filtros informados.</td></tr>
+                    <tr>
+                      <td colspan="6">
+                        <div class="empty-state empty-state-rich">
+                          <img class="brand-logo" src="/logo.jpg" alt="" />
+                          <strong>Nenhum bem encontrado</strong>
+                          <p>Ajuste os filtros ou cadastre o primeiro item do inventário da paróquia.</p>
+                          <button type="button" class="btn btn-primary" (click)="setView('create')">Cadastrar bem</button>
+                        </div>
+                      </td>
+                    </tr>
                   }
                 </tbody>
               </table>
@@ -210,29 +233,37 @@ type LookupList = Array<CatalogResponse | CodedCatalogResponse>;
           </article>
         }
 
-        <article class="card-soft span-2">
-          <div class="section-heading compact">
-            <p class="eyebrow">Relatórios e retorno</p>
-            <h2>Saída operacional</h2>
-          </div>
-
-          <div class="report-panel">
-            <button type="button" class="btn btn-secondary btn-block" (click)="downloadReport('csv')">Baixar CSV</button>
-            <button type="button" class="btn btn-secondary btn-block" (click)="downloadReport('excel')">Baixar Excel</button>
-            <button type="button" class="btn btn-secondary btn-block" (click)="downloadReport('pdf')">Baixar PDF</button>
-          </div>
-
-          @if (savedAsset()) {
+        @if (savedAsset() && viewMode() !== 'reports') {
+          <article class="card-soft span-2">
+            <div class="section-heading compact">
+              <p class="eyebrow">Bem registrado</p>
+              <h2>Código e etiqueta</h2>
+            </div>
             <div class="summary-card">
-              <p><strong>Código patrimonial:</strong> {{ savedAsset()?.assetCode }}</p>
+              <p><strong>Código patrimonial:</strong> <span class="tag tag-gold">{{ savedAsset()?.assetCode }}</span></p>
               <p><strong>Descrição:</strong> {{ savedAsset()?.description }}</p>
               <p><strong>Quantidade:</strong> {{ savedAsset()?.quantity }}</p>
               @if (barcodeImage()) {
-                <div class="barcode-frame"><img [src]="barcodeImage()" alt="Código de barras" /></div>
+                <div class="barcode-frame"><img [src]="barcodeImage()" alt="Código de barras do bem" /></div>
               }
             </div>
-          }
-        </article>
+          </article>
+        }
+
+        @if (viewMode() === 'reports') {
+          <article class="card-soft span-2">
+            <div class="section-heading compact">
+              <p class="eyebrow">Exportação</p>
+              <h2>Relatórios do inventário</h2>
+            </div>
+
+            <div class="report-panel">
+              <button type="button" class="btn btn-secondary btn-block" (click)="downloadReport('csv')">Planilha CSV</button>
+              <button type="button" class="btn btn-secondary btn-block" (click)="downloadReport('excel')">Planilha Excel</button>
+              <button type="button" class="btn btn-secondary btn-block" (click)="downloadReport('pdf')">Etiquetas PDF</button>
+            </div>
+          </article>
+        }
       </section>
     </section>
   `,
@@ -272,6 +303,30 @@ export class AssetsPageComponent {
   readonly barcodeImage = computed(() => {
     const value = this.savedAsset()?.barcodeValue;
     return value ? `data:image/png;base64,${value}` : '';
+  });
+  readonly appliedFilters = signal<AssetFilters>({});
+  readonly activeFilterChips = computed(() => {
+    const raw = this.appliedFilters();
+    const labels: Record<string, string> = {
+      assetCode: 'Código',
+      description: 'Descrição',
+      brand: 'Marca',
+      model: 'Modelo',
+      serialNumber: 'Série',
+      manufacturer: 'Fabricante',
+      invoice: 'Nota',
+      acquisitionDate: 'Aquisição',
+      disposalDate: 'Baixa',
+      color: 'Cor',
+      type: 'Tipo',
+      status: 'Status',
+      material: 'Material',
+      location: 'Local',
+    };
+
+    return Object.entries(raw)
+      .filter(([key, value]) => key !== 'createdFrom' && String(value ?? '').trim().length > 0)
+      .map(([key, value]) => ({ key, label: labels[key] ?? key, value: String(value) }));
   });
 
   readonly filterForm = this.fb.nonNullable.group({
@@ -331,6 +386,20 @@ export class AssetsPageComponent {
     return 'code' in item;
   }
 
+  statusTagClass(status?: string): string {
+    const normalized = (status ?? '').toUpperCase();
+    if (normalized.includes('USO') || normalized.includes('ATIVO')) {
+      return 'tag-success';
+    }
+    if (normalized.includes('DANIFIC') || normalized.includes('BAIXA') || normalized.includes('INUTIL')) {
+      return 'tag-danger';
+    }
+    if (normalized.includes('DOA') || normalized.includes('MANUT')) {
+      return 'tag-warning';
+    }
+    return 'tag-muted';
+  }
+
   searchAssets(resetPage = false): void {
     if (resetPage) {
       this.currentPage.set(0);
@@ -341,6 +410,8 @@ export class AssetsPageComponent {
     if (!filters) {
       return;
     }
+
+    this.appliedFilters.set(filters);
 
     this.assetsApi
       .list(filters, { page: this.currentPage(), size: this.pageSize() })

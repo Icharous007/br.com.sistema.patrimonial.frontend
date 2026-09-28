@@ -188,8 +188,8 @@ describe('ShellComponent', () => {
 
   // ── pageTitle ─────────────────────────────────────────────────────────────
 
-  it('pageTitle should be set to "Boas-vindas" on initial load', () => {
-    expect(component.pageTitle()).toBe('Boas-vindas');
+  it('pageTitle should be set to "Início" on initial load', () => {
+    expect(component.pageTitle()).toBe('Início');
   });
 
   // ── template ─────────────────────────────────────────────────────────────

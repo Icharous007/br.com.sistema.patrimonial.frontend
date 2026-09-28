@@ -16,35 +16,32 @@ import { sanitizeCpf } from '../../shared/utils/cpf.utils';
   imports: [CommonModule, ReactiveFormsModule, CpfMaskDirective],
   template: `
     <div class="auth-page">
-      <section class="auth-hero card-hero">
-        <p class="eyebrow">Plataforma institucional</p>
-        <h1>Controle patrimonial com visão operacional e elegância visual.</h1>
-        <p class="hero-copy">
-          Acesse um ambiente completo para autenticação, cadastros auxiliares, usuários, perfis,
-          bens e relatórios consolidados em Angular 21.
-        </p>
-
-        <div class="feature-grid">
-          <article class="feature-card">
-            <strong>Login com JWT</strong>
-            <span>Sessão protegida por perfis COMUM, SECRETARIO e ADMINISTRADOR.</span>
-          </article>
-          <article class="feature-card">
-            <strong>Fluxos por endpoint</strong>
-            <span>Menus em cascata para consulta, cadastro, edição e relatórios.</span>
-          </article>
-          <article class="feature-card">
-            <strong>Cadastros conectados</strong>
-            <span>Seleções cruzadas com listas de cores, tipos, status, materiais e locais.</span>
-          </article>
+      <section class="auth-hero card-hero hero-photo">
+        <div class="hero-photo-content">
+          <img class="brand-logo brand-logo-lg" src="/logo.jpg" width="112" height="112" alt="Brasão da Paróquia São Francisco de Assis" />
+          <p class="eyebrow">Paróquia São Francisco de Assis</p>
+          <h1>Cuidar dos bens da comunidade.</h1>
+          <p class="hero-copy">
+            Inventário da paróquia em Vicente Pires — nave, sacristia, secretaria e demais espaços
+            sob um só registro.
+          </p>
+          <span class="motto">Pax et Bonum</span>
         </div>
       </section>
 
       <section class="auth-panel card-soft">
+        <div class="auth-mobile-brand">
+          <img class="brand-logo brand-logo-sm" src="/logo.jpg" width="44" height="44" alt="Brasão da Paróquia São Francisco de Assis" />
+          <div>
+            <p class="eyebrow">PSFA</p>
+            <strong>Sistema Patrimonial</strong>
+          </div>
+        </div>
+
         <div class="section-heading compact">
-          <p class="eyebrow">Acesso seguro</p>
-          <h2>Login</h2>
-          <p>Informe CPF e senha para entrar no sistema.</p>
+          <p class="eyebrow">Acesso da secretaria</p>
+          <h2>Entrar</h2>
+          <p>Informe CPF e senha para consultar e registrar o patrimônio da paróquia.</p>
         </div>
 
         <form class="form-grid single-column" [formGroup]="loginForm" (ngSubmit)="submit()">
@@ -63,7 +60,7 @@ import { sanitizeCpf } from '../../shared/utils/cpf.utils';
           }
 
           <button type="submit" class="btn btn-primary btn-block" [disabled]="loading()">
-            {{ loading() ? 'Entrando...' : 'Entrar no painel' }}
+            {{ loading() ? 'Entrando...' : 'Entrar' }}
           </button>
         </form>
       </section>
@@ -116,7 +113,7 @@ export class LoginPageComponent {
 
   private resolveErrorMessage(error: HttpErrorResponse): string {
     if (error.status === 0) {
-      return 'Não foi possível alcançar o backend. Verifique se a API está ativa, se a porta está correta e se o CORS está liberado.';
+      return 'Não foi possível conectar ao servidor. Tente novamente em instantes.';
     }
 
     const apiError = error.error as ApiErrorResponse | string | undefined;
@@ -128,8 +125,16 @@ export class LoginPageComponent {
       return String(apiError.message);
     }
 
+    if (error.status === 423) {
+      return 'Esta conta está temporariamente bloqueada. Aguarde alguns minutos e tente de novo.';
+    }
+
+    if (error.status === 429) {
+      return 'Muitas tentativas de acesso. Aguarde um momento antes de tentar novamente.';
+    }
+
     if (error.status >= 500) {
-      return 'O backend retornou erro interno no login. Verifique o log da API.';
+      return 'O serviço está indisponível no momento. Tente novamente em instantes.';
     }
 
     return 'Não foi possível autenticar com os dados informados.';

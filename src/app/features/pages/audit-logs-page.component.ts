@@ -22,9 +22,9 @@ import { sanitizeCpf } from '../../shared/utils/cpf.utils';
     <section class="page-stack">
       <div class="page-header card-soft">
         <div class="section-heading compact">
-          <p class="eyebrow">Endpoint /api/audit-logs</p>
+          <p class="eyebrow">Controle</p>
           <h1>Auditoria</h1>
-          <p>Histórico das ações executadas pelos usuários (criação, atualização e exclusão de registros). Acesso exclusivo do perfil <strong>ADMINISTRADOR</strong>.</p>
+          <p>Histórico de criações, alterações e exclusões. Disponível apenas para o administrador.</p>
         </div>
       </div>
 

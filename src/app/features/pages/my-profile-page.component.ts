@@ -18,9 +18,9 @@ import { MeApiService } from '../../core/services/me-api.service';
     <section class="page-stack">
       <div class="page-header card-soft">
         <div class="section-heading compact">
-          <p class="eyebrow">Endpoint /api/me</p>
-          <h1>Meu Perfil</h1>
-          <p>Visualize e atualize seus dados pessoais ou altere sua senha de acesso.</p>
+          <p class="eyebrow">Minha conta</p>
+          <h1>Meu perfil</h1>
+          <p>Atualize seus dados pessoais ou altere a senha de acesso.</p>
         </div>
 
         <div class="segment-group wrap">

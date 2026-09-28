@@ -25,7 +25,7 @@ import { CatalogApiService } from '../../core/services/catalog-api.service';
     <section class="page-stack">
       <div class="page-header card-soft">
         <div class="section-heading compact">
-          <p class="eyebrow">Endpoint /api/{{ data.endpoint }}</p>
+          <p class="eyebrow">Cadastros da paróquia</p>
           <h1>{{ data.title }}</h1>
           <p>{{ data.subtitle }}</p>
         </div>

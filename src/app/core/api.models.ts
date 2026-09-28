@@ -1,3 +1,5 @@
+import { environment } from '../../environments/environment';
+
 export type ProfileName = 'COMUM' | 'SECRETARIO' | 'ADMINISTRADOR';
 
 export interface ApiErrorResponse {
@@ -32,8 +34,6 @@ export interface LoginResponse {
   tokenType: 'Bearer';
   accessToken: string;
   expiresInSeconds: number;
-  refreshToken: string;
-  refreshExpiresInSeconds: number;
   requirePasswordChange: boolean;
 }
 
@@ -233,6 +233,6 @@ export interface MenuSection {
   items: MenuItem[];
 }
 
-export const API_BASE_URL = 'http://localhost:8080';
+export const API_BASE_URL = environment.apiBaseUrl;
 
 export const ALL_PROFILES: ProfileName[] = ['COMUM', 'SECRETARIO', 'ADMINISTRADOR'];
